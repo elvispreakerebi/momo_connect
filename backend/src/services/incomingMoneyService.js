@@ -60,51 +60,47 @@ class IncomingMoneyService {
   }
 
   parseMessageContent(content) {
-    // Updated pattern to be more flexible and catch more incoming money message formats
+    // Updated patterns to capture more transaction formats
     const incomingMoneyPatterns = [
       // Pattern for messages with transaction ID and timestamp
       /You have received ([\d,]+) RWF from (.*?) \(\*+\d{3}\) on your mobile money account at (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?Financial Transaction Id: (\d+)/i,
-      // Pattern for simpler format messages
-      /You have received ([\d,]+) RWF from (.*?) \(\*+\d{3}\)/i
+      // Pattern for simpler format messages with masked number
+      /You have received ([\d,]+) RWF from (.*?) \(\*+\d{3}\)/i,
+      // Fallback pattern for any message containing "received" and "RWF from"
+      /received\s+([\d,]+)\s+RWF\s+from\s+(.*?)(?:\s|$)/i
     ];
 
     for (const pattern of incomingMoneyPatterns) {
       const match = content.match(pattern);
       if (match) {
-        // For messages with full details (timestamp and transaction ID)
+        // When full details are present, match.length should be 5
         if (match.length === 5) {
           const amount = parseFloat(match[1].replace(/,/g, ''));
           const sender = match[2];
-          const dateTime = new Date(match[3]);
+          const timestamp = match[3];
           const transactionId = match[4];
-
           return {
-            transaction_id: transactionId,
-            amount,
-            sender,
-            date: dateTime.toISOString().split('T')[0],
-            time: dateTime.toTimeString().split(' ')[0],
-            message_content: content
+            // We use sender as the address and contact_name for simplicity.
+            address: sender,
+            date: Date.parse(timestamp) || Date.now(),
+            // Combine details into the body field.
+            body: `Amount: ${amount} RWF, TransactionId: ${transactionId}`,
+            contact_name: sender
           };
         }
-        // For simpler format messages
-        else {
+        // When using simpler or fallback pattern
+        if (match.length >= 3) {
           const amount = parseFloat(match[1].replace(/,/g, ''));
           const sender = match[2];
-          const now = new Date();
-
           return {
-            transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            amount,
-            sender,
-            date: now.toISOString().split('T')[0],
-            time: now.toTimeString().split(' ')[0],
-            message_content: content
+            address: sender,
+            date: Date.now(),
+            body: `Amount: ${amount} RWF`,
+            contact_name: sender
           };
         }
       }
     }
-
     return null;
   }
 }
