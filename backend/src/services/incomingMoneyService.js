@@ -60,22 +60,49 @@ class IncomingMoneyService {
   }
 
   parseMessageContent(content) {
-    const incomingMoneyPattern = /You have received ([\d,]+) RWF from (.*?) \(\*+\d{3}\)/i;
-    const match = content.match(incomingMoneyPattern);
+    // Updated pattern to be more flexible and catch more incoming money message formats
+    const incomingMoneyPatterns = [
+      // Pattern for messages with transaction ID and timestamp
+      /You have received ([\d,]+) RWF from (.*?) \(\*+\d{3}\) on your mobile money account at (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?Financial Transaction Id: (\d+)/i,
+      // Pattern for simpler format messages
+      /You have received ([\d,]+) RWF from (.*?) \(\*+\d{3}\)/i
+    ];
 
-    if (match) {
-      const amount = parseFloat(match[1].replace(/,/g, ''));
-      const sender = match[2];
-      const now = new Date();
+    for (const pattern of incomingMoneyPatterns) {
+      const match = content.match(pattern);
+      if (match) {
+        // For messages with full details (timestamp and transaction ID)
+        if (match.length === 5) {
+          const amount = parseFloat(match[1].replace(/,/g, ''));
+          const sender = match[2];
+          const dateTime = new Date(match[3]);
+          const transactionId = match[4];
 
-      return {
-        transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        amount,
-        sender,
-        date: now.toISOString().split('T')[0],
-        time: now.toTimeString().split(' ')[0],
-        message_content: content
-      };
+          return {
+            transaction_id: transactionId,
+            amount,
+            sender,
+            date: dateTime.toISOString().split('T')[0],
+            time: dateTime.toTimeString().split(' ')[0],
+            message_content: content
+          };
+        }
+        // For simpler format messages
+        else {
+          const amount = parseFloat(match[1].replace(/,/g, ''));
+          const sender = match[2];
+          const now = new Date();
+
+          return {
+            transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            amount,
+            sender,
+            date: now.toISOString().split('T')[0],
+            time: now.toTimeString().split(' ')[0],
+            message_content: content
+          };
+        }
+      }
     }
 
     return null;
