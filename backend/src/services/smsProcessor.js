@@ -1,7 +1,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const xml2js = require('xml2js');
-const { pool } = require('../models/database');
+const { pool } = require('../models/databaseInit');
 const incomingMoneyService = require('./incomingMoneyService');
 
 class SMSProcessor {
@@ -130,8 +130,11 @@ class SMSProcessor {
       if (typeof data.amount === 'number') {
         data.amount = data.amount.toFixed(2);
       }
+
+      // Resolve the data if it's a Promise
+      const resolvedData = data instanceof Promise ? await data : data;
       
-      const [result] = await connection.query('INSERT INTO transactions SET ?', data);
+      const [result] = await connection.query('INSERT INTO transactions SET ?', [resolvedData]);
       console.log('Transaction saved successfully:', result);
       connection.release();
       return result;

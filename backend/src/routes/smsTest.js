@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { initializeDatabase } = require('../models/database');
+const { initializeDatabase } = require('../models/databaseInit');
 const SMSProcessor = require('../services/smsProcessor');
 
 // Test route for processing SMS
