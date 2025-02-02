@@ -2,6 +2,7 @@ const fs = require('fs').promises;
 const path = require('path');
 const xml2js = require('xml2js');
 const { pool } = require('../models/database');
+const incomingMoneyService = require('./incomingMoneyService');
 
 class SMSProcessor {
   constructor() {
@@ -60,7 +61,7 @@ class SMSProcessor {
     return null;
   }
 
-  extractTransactionData(type, match, rawContent) {
+  async extractTransactionData(type, match, rawContent) {
     const amount = parseFloat(match[1].replace(/,/g, ''));
     
     const baseData = {
@@ -74,10 +75,20 @@ class SMSProcessor {
 
     switch (type) {
       case 'incomingMoney':
-        return {
+        const data = {
           ...baseData,
           sender: match[2]
         };
+        // Save to incoming_money table
+        await this.saveIncomingMoney({
+          transaction_id: data.transaction_id,
+          amount: data.amount,
+          sender: data.sender,
+          date: new Date().toISOString().split('T')[0],
+          time: new Date().toTimeString().split(' ')[0],
+          message_content: rawContent
+        });
+        return data;
       case 'payment':
         return {
           ...baseData,
@@ -127,6 +138,15 @@ class SMSProcessor {
     } catch (error) {
       console.error('Error saving transaction:', error);
       console.error('Transaction data:', data);
+      await this.logError('DATABASE_ERROR', error.message, JSON.stringify(data));
+      throw error;
+    }
+  }
+
+  async saveIncomingMoney(data) {
+    try {
+      return await incomingMoneyService.saveIncomingMoney(data);
+    } catch (error) {
       await this.logError('DATABASE_ERROR', error.message, JSON.stringify(data));
       throw error;
     }

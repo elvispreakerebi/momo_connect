@@ -3,6 +3,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { initializeDatabase } = require('./models/database');
 const SMSProcessor = require('./services/smsProcessor');
+const incomingMoneyRoutes = require('./routes/incomingMoney');
+const smsTestRoutes = require('./routes/smsTest');
 
 // Load environment variables
 dotenv.config();
@@ -23,29 +25,20 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to MoMo Connect API' });
 });
 
-// Test route for processing SMS
-app.get('/test-sms', async (req, res) => {
-  try {
-    // Initialize database
-    console.log('Initializing database...');
-    await initializeDatabase();
-    console.log('Database initialized successfully');
-    
-    // Process XML file
-    console.log('Creating SMS processor...');
-    const smsProcessor = new SMSProcessor();
-    console.log('Processing XML file...');
-    await smsProcessor.processXMLFile('./sms.xml');
-    console.log('XML file processed successfully');
-    
-    res.json({ message: 'SMS processing test completed successfully' });
-  } catch (error) {
-    console.error('Test failed:', error);
-    res.status(500).json({ error: error.message, details: error.stack });
-  }
-});
+// SMS test routes
+app.use('/test-sms', smsTestRoutes);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Routes
+app.use('/incoming-money', incomingMoneyRoutes);
+
+// Initialize database and start server
+initializeDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch(error => {
+    console.error('Failed to initialize database:', error);
+    process.exit(1);
+  });

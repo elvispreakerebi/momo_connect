@@ -53,6 +53,22 @@ async function initializeDatabase() {
     `);
     console.log('Transactions table created/verified successfully');
 
+    // Create incoming_money table
+    console.log('Creating incoming_money table...');
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS incoming_money (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        transaction_id VARCHAR(50),
+        amount DECIMAL(15, 2),
+        sender VARCHAR(100),
+        date DATE,
+        time TIME,
+        message_content TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('Incoming_money table created/verified successfully');
+
     // Create error_logs table
     console.log('Creating error_logs table...');
     await connection.query(`
