@@ -2,9 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const { initializeDatabase } = require('./models/databaseInit');
-const SMSProcessor = require('./services/smsProcessor');
 const incomingMoneyRoutes = require('./routes/incomingMoney');
 const smsTestRoutes = require('./routes/smsTest');
+const paymentToCodeHolderRoutes = require('./routes/paymentToCodeHolders');
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +30,7 @@ app.use('/test-sms', smsTestRoutes);
 
 // Routes
 app.use('/incoming-money', incomingMoneyRoutes);
+app.use('/payment-to-code-holder', paymentToCodeHolderRoutes);
 
 // Initialize database and start server
 initializeDatabase()

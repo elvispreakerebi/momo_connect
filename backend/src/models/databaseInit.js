@@ -2,6 +2,7 @@ const pool = require('../config/database');
 const { createTransactionsTable } = require('./transactionsModel');
 const { createIncomingMoneyTable } = require('./incomingMoneyModel');
 const { createErrorLogsTable } = require('./errorLogsModel');
+const { createPaymentToCodeHoldersTable } = require('./paymentToCodeHoldersModel');
 
 // Database initialization function
 async function initializeDatabase() {
@@ -14,6 +15,7 @@ async function initializeDatabase() {
     await createTransactionsTable();
     await createIncomingMoneyTable();
     await createErrorLogsTable();
+    await createPaymentToCodeHoldersTable();
 
     connection.release();
     console.log('Database initialized successfully');

@@ -60,39 +60,21 @@ async processMessage(message) {
 }
 
 parseMessageContent(content) {
-    // Detailed pattern to capture all transaction details for payments
-    const paymentDetailsRegex = /(?:You have paid|paid|transferred).*?(\d+(?:,\d{3})*(?:\.\d{2})?).*?(?:to\s+([\w\s]+).*?)?at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}).*?(?:Transaction Id:\s*(\d+))?/i;
-    // Simpler pattern to capture just the amount
-    const paymentRegex = /(?:You have paid|paid|transferred).*?(\d+(?:,\d{3})*(?:\.\d{2})?)/i;
+    // Pattern to capture payment details for code holders
+    const codeHolderPaymentRegex = /TxId:\s*(\d+).*?Your payment of\s*(\d+(?:,\d{3})*(?:\.\d{2})?)\s*RWF to\s*([\w\s]+)\s+(\d+).*?at\s*(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2})/i;
 
-    // Try the detailed pattern first
-    const detailedMatch = content.match(paymentDetailsRegex);
-    if (detailedMatch) {
-    const amount = parseFloat(detailedMatch[1].replace(/,/g, ''));
-    return {
-        transaction_id: detailedMatch[5] ? `TXN-${detailedMatch[5]}` : `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        amount: amount,
-        recipient_name: detailedMatch[2] ? detailedMatch[2].trim() : 'Unknown',
-        date: detailedMatch[3],
-        time: detailedMatch[4],
-        message_content: content
-    };
-    }
-
-    // Fallback to the simpler pattern
-    const simpleMatch = content.match(paymentRegex);
-    if (simpleMatch) {
-    const amount = parseFloat(simpleMatch[1].replace(/,/g, ''));
-    const now = new Date();
-    return {
-        transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        amount: amount,
-        recipient_name: 'Unknown',
-        recipient_code: 'Unknown',
-        date: now.toISOString().split('T')[0],
-        time: now.toTimeString().split(' ')[0],
-        message_content: content
-    };
+    const match = content.match(codeHolderPaymentRegex);
+    if (match) {
+        const amount = parseFloat(match[2].replace(/,/g, ''));
+        return {
+            transaction_id: `TXN-${match[1]}`,
+            amount: amount,
+            recipient_name: match[3].trim(),
+            recipient_code: match[4],
+            date: match[5],
+            time: match[6],
+            message_content: content
+        };
     }
 
     return null;
