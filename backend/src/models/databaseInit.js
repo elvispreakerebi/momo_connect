@@ -3,6 +3,7 @@ const { createTransactionsTable } = require('./transactionsModel');
 const { createIncomingMoneyTable } = require('./incomingMoneyModel');
 const { createErrorLogsTable } = require('./errorLogsModel');
 const { createPaymentToCodeHoldersTable } = require('./paymentToCodeHoldersModel');
+const { createTransferToMobileNumberTable } = require('./transferToMobileNumberModel');
 
 // Database initialization function
 async function initializeDatabase() {
@@ -16,6 +17,7 @@ async function initializeDatabase() {
     await createIncomingMoneyTable();
     await createErrorLogsTable();
     await createPaymentToCodeHoldersTable();
+    await createTransferToMobileNumberTable();
 
     connection.release();
     console.log('Database initialized successfully');
