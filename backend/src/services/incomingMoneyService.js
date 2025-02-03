@@ -60,47 +60,40 @@ class IncomingMoneyService {
   }
 
   parseMessageContent(content) {
-    // Updated patterns to capture more transaction formats
-    const incomingMoneyPatterns = [
-      // Pattern for messages with transaction ID and timestamp
-      /You have received ([\d,]+) RWF from (.*?) \(\*+\d{3}\) on your mobile money account at (\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}).*?Financial Transaction Id: (\d+)/i,
-      // Pattern for simpler format messages with masked number
-      /You have received ([\d,]+) RWF from (.*?) \(\*+\d{3}\)/i,
-      // Fallback pattern for any message containing "received" and "RWF from"
-      /received\s+([\d,]+)\s+RWF\s+from\s+(.*?)(?:\s|$)/i
-    ];
+    // Detailed pattern to capture all transaction details
+    const incomingMoneyDetailsRegex = /(?:You have received|received|credited|deposit|A bank deposit).*?(\d+(?:,\d{3})*(?:\.\d{2})?).*?(?:from\s+([\w\s]+).*?)?at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}).*?(?:Financial Transaction Id:\s*(\d+))?/i;
+    // Simpler pattern to capture just the amount
+    const incomingMoneyRegex = /(?:You have received|received|credited|deposit|A bank deposit).*?(\d+(?:,\d{3})*(?:\.\d{2})?)/i;
 
-    for (const pattern of incomingMoneyPatterns) {
-      const match = content.match(pattern);
-      if (match) {
-        // When full details are present, match.length should be 5
-        if (match.length === 5) {
-          const amount = parseFloat(match[1].replace(/,/g, ''));
-          const sender = match[2];
-          const timestamp = match[3];
-          const transactionId = match[4];
-          return {
-            // We use sender as the address and contact_name for simplicity.
-            address: sender,
-            date: Date.parse(timestamp) || Date.now(),
-            // Combine details into the body field.
-            body: `Amount: ${amount} RWF, TransactionId: ${transactionId}`,
-            contact_name: sender
-          };
-        }
-        // When using simpler or fallback pattern
-        if (match.length >= 3) {
-          const amount = parseFloat(match[1].replace(/,/g, ''));
-          const sender = match[2];
-          return {
-            address: sender,
-            date: Date.now(),
-            body: `Amount: ${amount} RWF`,
-            contact_name: sender
-          };
-        }
-      }
+    // Try detailed pattern first
+    const detailedMatch = content.match(incomingMoneyDetailsRegex);
+    if (detailedMatch) {
+      const amount = parseFloat(detailedMatch[1].replace(/,/g, ''));
+      return {
+        transaction_id: detailedMatch[5] ? `TXN-${detailedMatch[5]}` : `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        amount: amount,
+        sender: detailedMatch[2] ? detailedMatch[2].trim() : 'Bank',
+        date: detailedMatch[3],
+        time: detailedMatch[4],
+        message_content: content
+      };
     }
+
+    // Fall back to simpler pattern
+    const simpleMatch = content.match(incomingMoneyRegex);
+    if (simpleMatch) {
+      const amount = parseFloat(simpleMatch[1].replace(/,/g, ''));
+      const now = new Date();
+      return {
+        transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        amount: amount,
+        sender: 'Bank',
+        date: now.toISOString().split('T')[0],
+        time: now.toTimeString().split(' ')[0],
+        message_content: content
+      };
+    }
+
     return null;
   }
 }

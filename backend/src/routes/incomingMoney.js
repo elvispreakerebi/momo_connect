@@ -42,7 +42,7 @@ router.get('/total', async (req, res) => {
 // Process XML file and save incoming money messages
 router.get('/process-xml', async (req, res) => {
   try {
-    const filePath = './sms.xml'
+    const filePath = './modified_sms_v2.xml'
     if (!filePath) {
       return res.status(400).json({
         success: false,
