@@ -6,6 +6,7 @@ const incomingMoneyRoutes = require('./routes/incomingMoney');
 const smsTestRoutes = require('./routes/smsTest');
 const paymentToCodeHolderRoutes = require('./routes/paymentToCodeHolders');
 const transferToMobileNumberRoutes = require('./routes/transferToMobileNumber');
+const airtimeRoutes = require('./routes/airtime');
 
 // Load environment variables
 dotenv.config();
@@ -33,7 +34,7 @@ app.use('/test-sms', smsTestRoutes);
 app.use('/incoming-money', incomingMoneyRoutes);
 app.use('/payment-to-code-holder', paymentToCodeHolderRoutes);
 app.use('/transfer-to-mobile-number', transferToMobileNumberRoutes);
-
+app.use('/airtime', airtimeRoutes)
 // Initialize database and start server
 initializeDatabase()
   .then(() => {
