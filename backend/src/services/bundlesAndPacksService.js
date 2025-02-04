@@ -63,7 +63,7 @@ async processMessage(message) {
 
 parseMessageContent(content) {
     // Pattern to capture bundles and packs transaction details
-    const bundlesRegex = /\*163\*TxId:(\d+)\*B\*Your payment of\s*(\d+(?:,\d{3})*(?:\.\d{2})?)\s*RWF for Bundles And Packs.*?at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})/i;
+    const bundlesRegex = /\*162\*TxId:(\d+)\*S\*Your payment of\s*(\d+(?:,\d{3})*(?:\.\d{2})?)\s*RWF to Bundles and Packs with token.*?at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})/i;
     const match = content.match(bundlesRegex);
     if (match) {
     const amount = parseFloat(match[2].replace(/,/g, ''));
