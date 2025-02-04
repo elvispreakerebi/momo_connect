@@ -1,4 +1,4 @@
-const { pool } = require('./databaseInit');
+const pool = require('../config/database');
 
 async function createCashPowerTable() {
   try {
