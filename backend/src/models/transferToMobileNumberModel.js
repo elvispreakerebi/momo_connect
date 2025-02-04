@@ -7,15 +7,12 @@ async function createTransferToMobileNumberTable() {
     await connection.query(`
       CREATE TABLE IF NOT EXISTS transfer_to_mobile_number (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        transaction_id VARCHAR(50) UNIQUE,
         amount DECIMAL(15, 2),
-        sender VARCHAR(100),
-        recipient VARCHAR(100),
+        recipient_name VARCHAR(100),
         phone_number VARCHAR(20),
-        reference VARCHAR(100),
-        timestamp DATETIME,
-        status VARCHAR(20),
-        description TEXT,
+        date DATE,
+        time TIME,
+        message_content TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);

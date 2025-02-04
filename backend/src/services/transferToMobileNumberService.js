@@ -21,7 +21,7 @@ class TransferToMobileNumberService {
   async getAllTransfers() {
     try {
       const connection = await pool.getConnection();
-      const [rows] = await connection.query('SELECT * FROM transfer_to_mobile_number ORDER BY timestamp DESC');
+      const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM transfer_to_mobile_number ORDER BY date DESC, time DESC');
       connection.release();
       return rows;
     } catch (error) {
@@ -61,18 +61,18 @@ class TransferToMobileNumberService {
 
   parseMessageContent(content) {
     // Pattern to capture transfer details to mobile number
-    const mobileNumberTransferRegex =/(\d{1,})\s*RWF\s*transferred\s*to\s*([\w\s]+)\s*\((\d+)\)\s*from\s*\d+\s*at\s*(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2})/;
+    const mobileNumberTransferRegex = /(\d{1,})\s*RWF\s*transferred\s*to\s*([\w\s]+)\s*\((\d+)\)\s*from\s*\d+\s*at\s*(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2})/;
+
 
     const match = content.match(mobileNumberTransferRegex);
     if (match) {
-      const amount = parseFloat(match[2].replace(/,/g, ''));
+      const amount = parseFloat(match[1].replace(/,/g, ''));
       return {
-        transaction_id: `TXN-${match[1]}`,
         amount: amount,
-        recipient_name: match[3].trim(),
-        phone_number: match[4],
-        date: match[5],
-        time: match[6],
+        recipient_name: match[2].trim(),
+        phone_number: match[3],
+        date: match[4],
+        time: match[5],
         message_content: content
       };
     }
