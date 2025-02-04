@@ -61,7 +61,7 @@ class WithdrawalFromAgentService {
 
   parseMessageContent(content) {
     // Pattern to capture withdrawal transaction details
-    const withdrawalRegex = /\*162\*TxId:(\d+)\*S\*Your withdrawal of\s*(\d+(?:,\d{3})*(?:\.\d{2})?)\s*RWF from agent\s*(.*?)\s*with number\s*(\d+)\s*at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})/i;
+    const withdrawalRegex = /via agent:\s+Agent\s+([\w\s]+)\s+\((\d{10,12})\),\s+withdrawn\s+(\d+(?:,\d{3})*(?:\.\d{2})?)\s*RWF from your mobile money account.*?at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})/i;
     const match = content.match(withdrawalRegex);
     if (match) {
       const amount = parseFloat(match[2].replace(/,/g, ''));
