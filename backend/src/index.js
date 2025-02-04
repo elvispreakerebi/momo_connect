@@ -9,6 +9,7 @@ const transferToMobileNumberRoutes = require('./routes/transferToMobileNumber');
 const airtimeRoutes = require('./routes/airtime');
 const cashPowerRoutes = require('./routes/cashPower');
 const bundlesAndPacksRoutes = require('./routes/bundlesAndPacks');
+const withdrawalFromAgentRoutes = require('./routes/withdrawalFromAgent');
 
 // Load environment variables
 dotenv.config();
@@ -39,6 +40,7 @@ app.use('/transfer-to-mobile-number', transferToMobileNumberRoutes);
 app.use('/airtime', airtimeRoutes)
 app.use('/cash-power', cashPowerRoutes)
 app.use('/bundles-and-packs', bundlesAndPacksRoutes)
+app.use('/withdrawal-from-agent', withdrawalFromAgentRoutes);
 
 // Initialize database and start server
 initializeDatabase()
