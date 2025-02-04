@@ -64,18 +64,17 @@ class WithdrawalFromAgentService {
     const withdrawalRegex = /via agent:\s+Agent\s+([\w\s]+)\s+\((\d{10,12})\),\s+withdrawn\s+(\d+(?:,\d{3})*(?:\.\d{2})?)\s*RWF from your mobile money account.*?at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})/i;
     const match = content.match(withdrawalRegex);
     if (match) {
-      const amount = parseFloat(match[2].replace(/,/g, ''));
+      const amount = parseFloat(match[3].replace(/,/g, ''));
       return {
-        transaction_id: `TXN-${match[1]}`,
+        transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         amount: amount,
-        agent_name: match[3],
-        agent_number: match[4],
-        date: match[5],
-        time: match[6],
+        agent_name: match[1],
+        agent_number: match[2],
+        date: match[4],
+        time: match[5],
         message_content: content
       };
     }
-
     return null;
   }
 }

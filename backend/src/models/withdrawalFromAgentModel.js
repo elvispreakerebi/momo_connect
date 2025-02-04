@@ -1,4 +1,4 @@
-const pool = require('../config/database');
+const { pool } = require('./databaseInit');
 
 async function createWithdrawalFromAgentTable() {
   try {
@@ -25,4 +25,6 @@ async function createWithdrawalFromAgentTable() {
   }
 }
 
-module.exports = { createWithdrawalFromAgentTable };
+module.exports = {
+  createWithdrawalFromAgentTable
+};

@@ -10,6 +10,7 @@ const airtimeRoutes = require('./routes/airtime');
 const cashPowerRoutes = require('./routes/cashPower');
 const bundlesAndPacksRoutes = require('./routes/bundlesAndPacks');
 const withdrawalFromAgentRoutes = require('./routes/withdrawalFromAgent');
+const { createWithdrawalFromAgentTable } = require('./models/withdrawalFromAgentModel');
 
 // Load environment variables
 dotenv.config();
@@ -41,6 +42,16 @@ app.use('/airtime', airtimeRoutes)
 app.use('/cash-power', cashPowerRoutes)
 app.use('/bundles-and-packs', bundlesAndPacksRoutes)
 app.use('/withdrawal-from-agent', withdrawalFromAgentRoutes);
+
+// Initialize database tables
+const initializeTables = async () => {
+  try {
+    await createWithdrawalFromAgentTable();
+  } catch (error) {
+    console.error('Error initializing tables:', error);
+    process.exit(1);
+  }
+};
 
 // Initialize database and start server
 initializeDatabase()
