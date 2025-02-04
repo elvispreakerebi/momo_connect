@@ -61,7 +61,7 @@ class CashPowerService {
 
   parseMessageContent(content) {
     // Pattern to capture cash power transaction details
-    const cashPowerRegex = /TxId:([\w-]+).*?payment\s+of\s+(\d+(?:,\d{3})*(?:\.\d{2})?)\s*RWF.*?Token:\s*([\d-]+).*?at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})/i;
+    const cashPowerRegex = /\*162\*TxId:(\d+)\*S\*Your payment of\s*(\d+(?:,\d{3})*(?:\.\d{2})?)\s*RWF to MTN Cash Power with token\s*([\d-]+)\s*has been completed at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})/i;
     const match = content.match(cashPowerRegex);
     
     if (match) {
