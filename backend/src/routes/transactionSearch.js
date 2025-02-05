@@ -28,8 +28,26 @@ const buildWhereClause = (startDate, endDate, minAmount, maxAmount) => {
   };
 };
 
+// Maximum number of retries for database operations
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
+
+// Helper function to execute database query with retry logic
+const executeQueryWithRetry = async (connection, query, params, retryCount = 0) => {
+  try {
+    return await connection.query(query, params);
+  } catch (error) {
+    if (error.code === 'ECONNRESET' && retryCount < MAX_RETRIES) {
+      await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+      return executeQueryWithRetry(connection, query, params, retryCount + 1);
+    }
+    throw error;
+  }
+};
+
 // Search and filter transactions
-router.get('/search', async (req, res) => {
+router.post('/search', async (req, res) => {
+  let connection;
   try {
     const {
       type,
@@ -39,7 +57,7 @@ router.get('/search', async (req, res) => {
       maxAmount,
       page = 1,
       limit = 10
-    } = req.query;
+    } = req.body;
 
     const offset = (page - 1) * limit;
     let tableName;
@@ -80,36 +98,39 @@ router.get('/search', async (req, res) => {
 
     const { whereClause, params } = buildWhereClause(startDate, endDate, minAmount, maxAmount, tableName);
 
-    const connection = await pool.getConnection();
-    try {
-      // Get total count
-      const [countResult] = await connection.query(
-        `SELECT COUNT(*) as total FROM ${tableName} ${whereClause}`,
-        params
-      );
-      const totalCount = countResult[0].total;
+    connection = await pool.getConnection();
+    
+    // Get total count with retry logic
+    const [countResult] = await executeQueryWithRetry(
+      connection,
+      `SELECT COUNT(*) as total FROM ${tableName} ${whereClause}`,
+      params
+    );
+    const totalCount = countResult[0].total;
 
-
-    const [transactions] = await connection.query(
+    // Get transactions with retry logic
+    const [transactions] = await executeQueryWithRetry(
+      connection,
       `SELECT * FROM ${tableName} ${whereClause} ORDER BY date DESC LIMIT ? OFFSET ?`,
       [...params, parseInt(limit), offset]
     );
 
-      connection.release();
-
-      res.json({
-        transactions,
-        totalCount,
-        currentPage: parseInt(page),
-        totalPages: Math.ceil(totalCount / limit)
-      });
-    } catch (error) {
-      connection.release();
-      throw error;
-    }
+    res.json({
+      transactions,
+      totalCount,
+      currentPage: parseInt(page),
+      totalPages: Math.ceil(totalCount / limit)
+    });
   } catch (error) {
     console.error('Error searching transactions:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ 
+      error: 'Internal server error',
+      details: error.code === 'ECONNRESET' ? 'Database connection was reset. Please try again.' : 'An unexpected error occurred.'
+    });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
   }
 });
 
