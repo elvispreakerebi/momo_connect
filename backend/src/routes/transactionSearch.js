@@ -65,31 +65,34 @@ router.post('/search', async (req, res) => {
 
     switch (normalizedType) {
       case 'incoming':
-      case 'incoming-money':
+      case 'incoming money':
         tableName = 'incoming_money';
         break;
+      case 'bank deposit':
+        tableName = 'bank_deposit';
+        break;
       case 'payment':
-      case 'payment-to-code-holder':
+      case 'payment to code holder':
         tableName = 'payment_to_code_holders';
         break;
       case 'transfer':
-      case 'transfer-to-mobile-number':
+      case 'transfer to mobile number':
         tableName = 'transfer_to_mobile_number';
         break;
       case 'airtime':
-      case 'airtime-purchase':
+      case 'airtime purchase':
         tableName = 'airtime';
         break;
       case 'cashpower':
-      case 'cash-power':
+      case 'cash power':
         tableName = 'cash_power';
         break;
       case 'bundle':
-      case 'data-bundle':
+      case 'data and bundle':
         tableName = 'bundles_and_packs';
         break;
       case 'withdrawal':
-      case 'agent-withdrawal':
+      case 'withdrawals from agents':
         tableName = 'withdrawal_from_agent';
         break;
       default:
