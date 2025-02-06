@@ -1,4 +1,5 @@
 const { createCashPower } = require('../models/cashPowerModel');
+const { pool } = require('../models/databaseInit');
 const xml2js = require('xml2js');
 const fs = require('fs').promises;
 const path = require('path');
