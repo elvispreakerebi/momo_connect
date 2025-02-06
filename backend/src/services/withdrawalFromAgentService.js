@@ -77,6 +77,18 @@ class WithdrawalFromAgentService {
     }
     return null;
   }
+
+  async getWithdrawalById(id) {
+    try {
+      const connection = await pool.getConnection();
+      const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM withdrawal_from_agent WHERE id = ?', [id]);
+      connection.release();
+      return rows[0];
+    } catch (error) {
+      console.error('Error fetching withdrawal transaction by ID:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new WithdrawalFromAgentService();
