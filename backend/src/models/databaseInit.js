@@ -8,6 +8,7 @@ const { createAirtimeTable } = require('./airtimeModel');
 const { createCashPowerTable } = require('./cashPowerModel');
 const { createBundlesAndPacksTable } = require('./bundlesAndPacksModel');
 const { createWithdrawalFromAgentTable } = require('./withdrawalFromAgentModel');
+const { createBankDepositTable } = require('./bankDepositModel');
 
 // Database initialization function
 async function initializeDatabase() {
@@ -26,6 +27,7 @@ async function initializeDatabase() {
     await createCashPowerTable();
     await createBundlesAndPacksTable();
     await createWithdrawalFromAgentTable();
+    await createBankDepositTable();
 
     connection.release();
     console.log('Database initialized successfully');
