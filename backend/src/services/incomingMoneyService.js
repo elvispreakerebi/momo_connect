@@ -30,6 +30,18 @@ class IncomingMoneyService {
     }
   }
 
+  async getIncomingMoneyById(id) {
+    try {
+      const connection = await pool.getConnection();
+      const [rows] = await connection.query('SELECT * FROM incoming_money WHERE id = ?', [id]);
+      connection.release();
+      return rows[0] || null;
+    } catch (error) {
+      console.error('Error fetching incoming money by ID:', error);
+      throw error;
+    }
+  }
+
   async processXMLFile(filePath) {
     try {
       const absolutePath = path.join(__dirname, '..', filePath);
