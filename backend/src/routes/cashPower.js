@@ -63,4 +63,30 @@ router.get('/process-xml', async (req, res) => {
   }
 });
 
+// Get a specific cash power transaction by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const transaction = await cashPowerService.getCashPowerById(id);
+    
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: 'Cash power transaction not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: transaction
+    });
+  } catch (error) {
+    console.error('Error fetching cash power transaction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch cash power transaction'
+    });
+  }
+});
+
 module.exports = router;

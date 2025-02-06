@@ -63,4 +63,30 @@ router.get('/process-xml', async (req, res) => {
   }
 });
 
+// Get a specific bundle transaction by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const transaction = await bundlesAndPacksService.getBundleById(id);
+    
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: 'Bundle transaction not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: transaction
+    });
+  } catch (error) {
+    console.error('Error fetching bundle transaction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch bundle transaction'
+    });
+  }
+});
+
 module.exports = router;

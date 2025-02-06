@@ -63,4 +63,30 @@ try {
 }
 });
 
+// Get a specific payment transaction by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const transaction = await paymentService.getPaymentById(id);
+    
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: 'Payment transaction not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: transaction
+    });
+  } catch (error) {
+    console.error('Error fetching payment transaction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch payment transaction'
+    });
+  }
+});
+
 module.exports = router;

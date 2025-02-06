@@ -63,4 +63,30 @@ router.get('/process-xml', async (req, res) => {
   }
 });
 
+// Get a specific airtime transaction by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const transaction = await airtimeService.getAirtimeById(id);
+    
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: 'Airtime transaction not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: transaction
+    });
+  } catch (error) {
+    console.error('Error fetching airtime transaction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch airtime transaction'
+    });
+  }
+});
+
 module.exports = router;

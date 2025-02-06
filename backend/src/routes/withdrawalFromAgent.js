@@ -63,4 +63,30 @@ router.get('/process-xml', async (req, res) => {
   }
 });
 
+// Get a specific withdrawal transaction by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const transaction = await withdrawalFromAgentService.getWithdrawalById(id);
+    
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: 'Withdrawal transaction not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: transaction
+    });
+  } catch (error) {
+    console.error('Error fetching withdrawal transaction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch withdrawal transaction'
+    });
+  }
+});
+
 module.exports = router;

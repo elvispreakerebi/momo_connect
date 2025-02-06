@@ -64,4 +64,30 @@ router.get('/process-xml', async (req, res) => {
   }
 });
 
+// Get a specific incoming money transaction by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const transaction = await incomingMoneyService.getIncomingMoneyById(id);
+    
+    if (!transaction) {
+      return res.status(404).json({
+        success: false,
+        error: 'Incoming money transaction not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      data: transaction
+    });
+  } catch (error) {
+    console.error('Error fetching incoming money transaction:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch incoming money transaction'
+    });
+  }
+});
+
 module.exports = router;
