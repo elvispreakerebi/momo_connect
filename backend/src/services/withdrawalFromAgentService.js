@@ -1,4 +1,5 @@
 const { createWithdrawalFromAgent, getWithdrawalFromAgent } = require('../models/withdrawalFromAgentModel');
+const { pool } = require('../models/databaseInit');
 const xml2js = require('xml2js');
 const fs = require('fs').promises;
 const path = require('path');
