@@ -1,3 +1,4 @@
+const { pool } = require('../models/databaseInit');
 const { createBankDeposit } = require('../models/bankDepositModel');
 const xml2js = require('xml2js');
 const fs = require('fs').promises;
