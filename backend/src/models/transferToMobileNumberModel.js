@@ -6,7 +6,7 @@ async function createTransferToMobileNumberTable() {
     const connection = await pool.getConnection();
     await connection.query(`
       CREATE TABLE IF NOT EXISTS transfer_to_mobile_number (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
         amount DECIMAL(15, 2),
         recipient_name VARCHAR(100),
         phone_number VARCHAR(20),

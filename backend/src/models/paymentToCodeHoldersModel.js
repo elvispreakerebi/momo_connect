@@ -6,7 +6,7 @@ try {
     const connection = await pool.getConnection();
     await connection.query(`
     CREATE TABLE IF NOT EXISTS payment_to_code_holders (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
         transaction_id VARCHAR(50),
         amount DECIMAL(15, 2),
         recipient_name VARCHAR(100),

@@ -6,7 +6,7 @@ async function createWithdrawalFromAgentTable() {
     const connection = await pool.getConnection();
     await connection.query(`
       CREATE TABLE IF NOT EXISTS withdrawal_from_agent (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
         transaction_id VARCHAR(50),
         amount DECIMAL(15, 2),
         agent_name VARCHAR(100),
