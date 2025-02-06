@@ -1,4 +1,4 @@
-const { pool } = require('../models/databaseInit');
+const { createIncomingMoney } = require('../models/incomingMoneyModel');
 const xml2js = require('xml2js');
 const fs = require('fs').promises;
 const path = require('path');
@@ -7,10 +7,8 @@ class IncomingMoneyService {
   async saveIncomingMoney(data) {
     try {
       console.log('Saving incoming money transaction:', data);
-      const connection = await pool.getConnection();
-      const [result] = await connection.query('INSERT INTO incoming_money SET ?', data);
+      const result = await createIncomingMoney(data);
       console.log('Incoming money transaction saved successfully:', result);
-      connection.release();
       return result;
     } catch (error) {
       console.error('Error saving incoming money transaction:', error);
@@ -72,36 +70,18 @@ class IncomingMoneyService {
   }
 
   parseMessageContent(content) {
-    // Detailed pattern to capture all transaction details
-    const incomingMoneyDetailsRegex = /(?:You have received|received|credited|deposit|A bank deposit).*?(\d+(?:,\d{3})*(?:\.\d{2})?).*?(?:from\s+([\w\s]+).*?)?at\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}).*?(?:Financial Transaction Id:\s*(\d+))?/i;
-    // Simpler pattern to capture just the amount
-    const incomingMoneyRegex = /(?:You have received|received|credited|deposit|A bank deposit).*?(\d+(?:,\d{3})*(?:\.\d{2})?)/i;
+    // Pattern to capture incoming money transaction details
+    const incomingMoneyRegex = /received\s*(\d+)\s*RWF\s*from\s*([\w\s]+)\s*\(.*?\)\s*on your mobile money account at\s*(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2}).*?Financial Transaction Id:\s*(\d+)/;
 
-    // Try detailed pattern first
-    const detailedMatch = content.match(incomingMoneyDetailsRegex);
-    if (detailedMatch) {
-      const amount = parseFloat(detailedMatch[1].replace(/,/g, ''));
+    const match = content.match(incomingMoneyRegex);
+    if (match) {
+      const amount = parseFloat(match[1]);
       return {
-        transaction_id: detailedMatch[5] ? `TXN-${detailedMatch[5]}` : `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        transaction_id: `${match[5]}`,
         amount: amount,
-        sender: detailedMatch[2] ? detailedMatch[2].trim() : 'Bank',
-        date: detailedMatch[3],
-        time: detailedMatch[4],
-        message_content: content
-      };
-    }
-
-    // Fall back to simpler pattern
-    const simpleMatch = content.match(incomingMoneyRegex);
-    if (simpleMatch) {
-      const amount = parseFloat(simpleMatch[1].replace(/,/g, ''));
-      const now = new Date();
-      return {
-        transaction_id: `TXN-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        amount: amount,
-        sender: 'Bank',
-        date: now.toISOString().split('T')[0],
-        time: now.toTimeString().split(' ')[0],
+        sender: match[2].trim(),
+        date: match[3],
+        time: match[4],
         message_content: content
       };
     }

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const incomingMoneyService = require('../services/incomingMoneyService');
+const { createIncomingMoneyTable } = require('../models/incomingMoneyModel');
 
 // Get all incoming money transactions
 router.get('/', async (req, res) => {
@@ -38,6 +39,11 @@ router.get('/total', async (req, res) => {
     });
   }
 });
+
+// Initialize database table
+createIncomingMoneyTable()
+  .then(() => console.log('Database table initialized'))
+  .catch(err => console.error('Error initializing database table:', err));
 
 // Process XML file and save incoming money messages
 router.get('/process-xml', async (req, res) => {

@@ -3,7 +3,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const { initializeDatabase } = require('./models/databaseInit');
 const incomingMoneyRoutes = require('./routes/incomingMoney');
-const smsTestRoutes = require('./routes/smsTest');
 const paymentToCodeHolderRoutes = require('./routes/paymentToCodeHolders');
 const transferToMobileNumberRoutes = require('./routes/transferToMobileNumber');
 const airtimeRoutes = require('./routes/airtime');
@@ -30,9 +29,6 @@ const PORT = process.env.PORT || 4000;
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to MoMo Connect API' });
 });
-
-// SMS test routes
-app.use('/test-sms', smsTestRoutes);
 
 // Routes
 app.use('/incoming-money', incomingMoneyRoutes);

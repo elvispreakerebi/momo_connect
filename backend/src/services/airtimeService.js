@@ -1,4 +1,4 @@
-const { pool } = require('../models/databaseInit');
+const { createAirtime } = require('../models/airtimeModel');
 const xml2js = require('xml2js');
 const fs = require('fs').promises;
 const path = require('path');
@@ -7,10 +7,8 @@ class AirtimeService {
   async saveAirtime(data) {
     try {
       console.log('Saving airtime transaction:', data);
-      const connection = await pool.getConnection();
-      const [result] = await connection.query('INSERT INTO airtime SET ?', data);
+      const result = await createAirtime(data);
       console.log('Airtime transaction saved successfully:', result);
-      connection.release();
       return result;
     } catch (error) {
       console.error('Error saving airtime transaction:', error);
@@ -78,7 +76,7 @@ class AirtimeService {
     if (match) {
       const amount = parseFloat(match[2].replace(/,/g, ''));
       return {
-        transaction_id: `TXN-${match[1]}`,
+        transaction_id: `${match[1]}`,
         amount: amount,
         date: match[3],
         time: match[4],

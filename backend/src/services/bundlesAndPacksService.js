@@ -1,4 +1,5 @@
-const { pool } = require('../models/databaseInit');
+const { createBundlesAndPacks } = require('../models/bundlesAndPacksModel');
+const pool = require('../config/database');
 const xml2js = require('xml2js');
 const fs = require('fs').promises;
 const path = require('path');
@@ -6,15 +7,13 @@ const path = require('path');
 class BundlesAndPacksService {
 async saveBundlesAndPacks(data) {
     try {
-    console.log('Saving bundles and packs transaction:', data);
-    const connection = await pool.getConnection();
-    const [result] = await connection.query('INSERT INTO bundles_and_packs SET ?', data);
-    console.log('Bundles and packs transaction saved successfully:', result);
-    connection.release();
-    return result;
+      console.log('Saving bundles and packs transaction:', data);
+      const result = await createBundlesAndPacks(data);
+      console.log('Bundles and packs transaction saved successfully:', result);
+      return result;
     } catch (error) {
-    console.error('Error saving bundles and packs transaction:', error);
-    throw error;
+      console.error('Error saving bundles and packs transaction:', error);
+      throw error;
     }
 }
 
@@ -80,7 +79,7 @@ parseMessageContent(content) {
     if (match) {
     const amount = parseFloat(match[2].replace(/,/g, ''));
     return {
-        transaction_id: `TXN-${match[1]}`,
+        transaction_id: `${match[1]}`,
         amount: amount,
         date: match[3],
         time: match[4],

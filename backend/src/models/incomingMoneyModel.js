@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const { v4: uuidv4 } = require('uuid');
 
 async function createIncomingMoneyTable() {
   try {
@@ -16,13 +17,6 @@ async function createIncomingMoneyTable() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
-    // Set up a trigger for UUID generation
-    await connection.query(`
-      CREATE TRIGGER IF NOT EXISTS incoming_money_before_insert
-      BEFORE INSERT ON incoming_money
-      FOR EACH ROW
-      SET NEW.id = UUID()
-    `);
     console.log('Incoming_money table created/verified successfully');
     connection.release();
   } catch (error) {
@@ -31,4 +25,32 @@ async function createIncomingMoneyTable() {
   }
 }
 
-module.exports = { createIncomingMoneyTable };
+async function createIncomingMoney(data) {
+  try {
+    const connection = await pool.getConnection();
+    const id = uuidv4();
+    const result = await connection.query(
+      'INSERT INTO incoming_money (id, transaction_id, amount, sender, date, time, message_content) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      [id, data.transaction_id, data.amount, data.sender, data.date, data.time, data.message_content]
+    );
+    connection.release();
+    return { id, ...data };
+  } catch (error) {
+    console.error('Error creating incoming money record:', error);
+    throw error;
+  }
+}
+
+async function getIncomingMoney(id) {
+  try {
+    const connection = await pool.getConnection();
+    const [rows] = await connection.query('SELECT * FROM incoming_money WHERE id = ?', [id]);
+    connection.release();
+    return rows[0];
+  } catch (error) {
+    console.error('Error getting incoming money record:', error);
+    throw error;
+  }
+}
+
+module.exports = { createIncomingMoneyTable, createIncomingMoney, getIncomingMoney };

@@ -1,4 +1,4 @@
-const { pool } = require('../models/databaseInit');
+const { createPaymentToCodeHolder } = require('../models/paymentToCodeHoldersModel');
 const xml2js = require('xml2js');
 const fs = require('fs').promises;
 const path = require('path');
@@ -6,15 +6,17 @@ const path = require('path');
 class PaymentToCodeHoldersService {
 async savePayment(data) {
     try {
-    console.log('Saving payment to code holders transaction:', data);
-    const connection = await pool.getConnection();
-    const [result] = await connection.query('INSERT INTO payment_to_code_holders SET ?', data);
-    console.log('Payment to code holders transaction saved successfully:', result);
-    connection.release();
-    return result;
+        console.log('Saving payment to code holders transaction:', data);
+        const result = await createPaymentToCodeHolder(data);
+        console.log('Payment to code holders transaction saved successfully:', result);
+        return result;
     } catch (error) {
-    console.error('Error saving payment to code holders transaction:', error);
-    throw error;
+        if (error.code === 'DUPLICATE_TRANSACTION') {
+            console.log('Skipping duplicate transaction:', data.transaction_id);
+            return null;
+        }
+        console.error('Error saving payment to code holders transaction:', error);
+        throw error;
     }
 }
 
@@ -61,13 +63,18 @@ async processXMLFile(filePath) {
 
 async processMessage(message) {
     try {
-    const transactionData = this.parseMessageContent(message.body);
-    if (transactionData) {
-        await this.savePayment(transactionData);
-    }
+        const transactionData = this.parseMessageContent(message.body);
+        if (transactionData) {
+            const result = await this.savePayment(transactionData);
+            if (result) {
+                console.log('Successfully processed payment to code holder message:', result.transaction_id);
+            }
+        } else {
+            console.log('Message does not match payment to code holder format:', message.body);
+        }
     } catch (error) {
-    console.error('Error processing message:', error);
-    throw error;
+        console.error('Error processing message:', error);
+        // Continue processing other messages even if one fails
     }
 }
 
@@ -79,7 +86,7 @@ parseMessageContent(content) {
     if (match) {
         const amount = parseFloat(match[2].replace(/,/g, ''));
         return {
-            transaction_id: `TXN-${match[1]}`,
+            transaction_id: `${match[1]}`,
             amount: amount,
             recipient_name: match[3].trim(),
             recipient_code: match[4],

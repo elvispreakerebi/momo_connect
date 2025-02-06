@@ -1,4 +1,5 @@
-const { pool } = require('../models/databaseInit');
+const pool = require('../config/database');
+const { createTransferToMobileNumber } = require('../models/transferToMobileNumberModel');
 const xml2js = require('xml2js');
 const fs = require('fs').promises;
 const path = require('path');
@@ -7,12 +8,13 @@ class TransferToMobileNumberService {
   async saveTransfer(data) {
     try {
       console.log('Saving transfer to mobile number transaction:', data);
-      const connection = await pool.getConnection();
-      const [result] = await connection.query('INSERT INTO transfer_to_mobile_number SET ?', data);
+      const result = await createTransferToMobileNumber(data);
       console.log('Transfer to mobile number transaction saved successfully:', result);
-      connection.release();
       return result;
     } catch (error) {
+      if (error.code === 'ER_DUP_ENTRY') {
+        throw new Error('Transaction with this ID already exists');
+      }
       console.error('Error saving transfer to mobile number transaction:', error);
       throw error;
     }
@@ -49,24 +51,75 @@ class TransferToMobileNumberService {
 
   async processMessage(message) {
     try {
-      const transactionData = this.parseMessageContent(message.body);
-      if (transactionData) {
-        await this.saveTransfer(transactionData);
+      if (!message.body) {
+        console.log('Skipping message - no body content');
+        return null;
       }
+
+      const messageContent = message.body;
+      let transaction = null;
+
+      // Try GNF format first
+      const gnfTransaction = this.parseGNFMessage(messageContent, message.date);
+      if (gnfTransaction) {
+        transaction = gnfTransaction;
+      } else {
+        // Try RWF format if GNF format doesn't match
+        const rwfTransaction = this.parseMessageContent(messageContent);
+        if (rwfTransaction) {
+          transaction = rwfTransaction;
+        }
+      }
+
+      if (!transaction) {
+        console.log('Skipping message - not a valid transfer transaction');
+        return null;
+      }
+
+      return await this.saveTransfer(transaction);
     } catch (error) {
-      console.error('Error processing message:', error);
+      console.error('Error processing transfer message:', error);
       throw error;
     }
   }
 
-  parseMessageContent(content) {
-    // Pattern to capture transfer details to mobile number
-    const mobileNumberTransferRegex = /(\d{1,})\s*RWF\s*transferred\s*to\s*([\w\s]+)\s*\((\d+)\)\s*from\s*\d+\s*at\s*(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2})/;
+  parseGNFMessage(messageContent, dateTimestamp) {
+    try {
+      if (!messageContent.includes('Transfer to')) {
+        return null;
+      }
 
+      const transactionMatch = messageContent.match(/ID:\s*(\w+)/);
+      const amountMatch = messageContent.match(/([\d,]+\.?\d*)\s*GNF/);
+      const recipientMatch = messageContent.match(/to\s+([^(]+)\s*\(/);
+      const phoneMatch = messageContent.match(/\((\+?\d+)\)/);
+      const dateTimeMatch = dateTimestamp && new Date(parseInt(dateTimestamp));
+
+      if (!transactionMatch || !amountMatch || !recipientMatch || !phoneMatch || !dateTimeMatch) {
+        return null;
+      }
+
+      return {
+        amount: parseFloat(amountMatch[1].replace(',', '')),
+        recipient_name: recipientMatch[1].trim(),
+        phone_number: phoneMatch[1],
+        date: dateTimeMatch.toISOString().split('T')[0],
+        time: dateTimeMatch.toTimeString().split(' ')[0],
+        message_content: messageContent
+      };
+    } catch (error) {
+      console.error('Error parsing GNF message:', error);
+      return null;
+    }
+  }
+
+  parseMessageContent(content) {
+    const mobileNumberTransferRegex = /(\d{1,})\s*RWF\s*transferred\s*to\s*([\w\s]+)\s*\((\d+)\)\s*from\s*\d+\s*at\s*(\d{4}-\d{2}-\d{2})\s*(\d{2}:\d{2}:\d{2})/;
 
     const match = content.match(mobileNumberTransferRegex);
     if (match) {
-      const amount = parseFloat(match[1].replace(/,/g, ''));
+      const amount = parseFloat(match[1]);
+      
       return {
         amount: amount,
         recipient_name: match[2].trim(),

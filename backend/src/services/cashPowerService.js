@@ -1,4 +1,4 @@
-const { pool } = require('../models/databaseInit');
+const { createCashPower } = require('../models/cashPowerModel');
 const xml2js = require('xml2js');
 const fs = require('fs').promises;
 const path = require('path');
@@ -7,10 +7,8 @@ class CashPowerService {
   async saveCashPower(data) {
     try {
       console.log('Saving cash power transaction:', data);
-      const connection = await pool.getConnection();
-      const [result] = await connection.query('INSERT INTO cash_power SET ?', data);
+      const result = await createCashPower(data);
       console.log('Cash power transaction saved successfully:', result);
-      connection.release();
       return result;
     } catch (error) {
       console.error('Error saving cash power transaction:', error);
@@ -79,7 +77,7 @@ class CashPowerService {
     if (match) {
       const amount = parseFloat(match[2].replace(/,/g, ''));
       return {
-        transaction_id: `TXN-${match[1]}`,
+        transaction_id: `${match[1]}`,
         amount: amount,
         token: match[3],
         date: match[4],
