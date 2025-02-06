@@ -30,6 +30,18 @@ class CashPowerService {
     }
   }
 
+  async getCashPowerById(id) {
+    try {
+      const connection = await pool.getConnection();
+      const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM cash_power WHERE id = ?', [id]);
+      connection.release();
+      return rows[0] || null;
+    } catch (error) {
+      console.error('Error fetching cash power by ID:', error);
+      throw error;
+    }
+  }
+
   async processXMLFile(filePath) {
     try {
       const absolutePath = path.join(__dirname, '..', filePath);
