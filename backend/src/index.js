@@ -11,6 +11,7 @@ const bundlesAndPacksRoutes = require('./routes/bundlesAndPacks');
 const withdrawalFromAgentRoutes = require('./routes/withdrawalFromAgent');
 const transactionSearchRoutes = require('./routes/transactionSearch');
 const bankDepositRoutes = require('./routes/bankDeposit');
+const visualizationRoutes = require('./routes/visualization');
 
 // Load environment variables
 dotenv.config();
@@ -41,6 +42,7 @@ app.use('/bundles-and-packs', bundlesAndPacksRoutes)
 app.use('/withdrawal-from-agent', withdrawalFromAgentRoutes);
 app.use('/transactions', transactionSearchRoutes);
 app.use('/bank-deposit', bankDepositRoutes);
+app.use('/visualization', visualizationRoutes);
 
 // Initialize database and start server
 initializeDatabase()
