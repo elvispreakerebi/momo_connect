@@ -18,14 +18,30 @@ class IncomingMoneyService {
   }
 
   async getAllIncomingMoney() {
-    try {
-      const connection = await pool.getConnection();
-      const [rows] = await connection.query('SELECT * FROM incoming_money ORDER BY date DESC, time DESC');
-      connection.release();
-      return rows;
-    } catch (error) {
-      console.error('Error fetching incoming money transactions:', error);
-      throw error;
+    let connection;
+    let retries = 3;
+    let delay = 1000; // Start with 1 second delay
+
+    while (retries > 0) {
+      try {
+        connection = await pool.getConnection();
+        const [rows] = await connection.query('SELECT * FROM incoming_money ORDER BY date DESC, time DESC');
+        return rows;
+      } catch (error) {
+        console.error(`Error fetching incoming money transactions (${retries} retries left):`, error);
+        retries--;
+        
+        if (retries > 0) {
+          await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2; // Exponential backoff
+        } else {
+          throw error;
+        }
+      } finally {
+        if (connection) {
+          connection.release();
+        }
+      }
     }
   }
 
