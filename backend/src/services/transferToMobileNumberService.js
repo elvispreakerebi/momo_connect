@@ -79,6 +79,18 @@ class TransferToMobileNumberService {
 
     return null;
   }
+
+  async getTransferById(id) {
+    try {
+      const connection = await pool.getConnection();
+      const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM transfer_to_mobile_number WHERE id = ?', [id]);
+      connection.release();
+      return rows[0] || null;
+    } catch (error) {
+      console.error('Error fetching transfer by ID:', error);
+      throw error;
+    }
+  }
 }
 
 module.exports = new TransferToMobileNumberService();
