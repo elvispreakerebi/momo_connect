@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const paymentService = require('../services/paymentToCodeHoldersService');
+const paymentToCodeHoldersService = require('../services/paymentToCodeHoldersService');
 
 // Get all payment to code holders transactions
 router.get('/', async (req, res) => {
@@ -19,24 +20,26 @@ try {
 }
 });
 
-// Get total payment amount
-router.get('/total-amount', async (req, res) => {
-try {
-    const transactions = await paymentService.getAllPayments();
+//Route to return the total amount and total transactions.
+router.get('/total', async (req, res) => {
+  try {
+    const transactions = await paymentToCodeHoldersService.getAllPayments();
     const totalAmount = transactions.reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);
+    const totalTransactions = Array.isArray(transactions) ? transactions.length : 0;
     res.json({
-    success: true,
-    data: {
-        totalAmount: totalAmount.toFixed(2)
-    }
+      success: true,
+      data: {
+        totalAmount: totalAmount.toFixed(2),
+        totalTransactions
+      }
     });
-} catch (error) {
-    console.error('Error calculating total payment amount:', error);
+  } catch (error) {
+    console.error('Error calculating payments to code holders totals:', error);
     res.status(500).json({
-    success: false,
-    error: 'Failed to calculate total payment amount'
+      success: false,
+      error: 'Failed to calculate payment to code holders totals'
     });
-}
+  }
 });
 
 // Process XML file and save payment to code holders messages
