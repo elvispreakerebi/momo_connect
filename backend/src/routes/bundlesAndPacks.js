@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get total bundles and packs amount
-router.get('/total', async (req, res) => {
+router.get('/total-amount', async (req, res) => {
   try {
     const transactions = await bundlesAndPacksService.getAllBundlesAndPacks();
     const totalAmount = transactions.reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);

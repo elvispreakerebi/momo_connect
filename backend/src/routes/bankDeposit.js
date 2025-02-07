@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get total bank deposit amount
-router.get('/total', async (req, res) => {
+router.get('/total-amount', async (req, res) => {
   try {
     const transactions = await bankDepositService.getAllBankDeposits();
     const totalAmount = transactions.reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);

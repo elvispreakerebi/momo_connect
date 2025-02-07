@@ -20,7 +20,7 @@ try {
 });
 
 // Get total payment amount
-router.get('/total', async (req, res) => {
+router.get('/total-amount', async (req, res) => {
 try {
     const transactions = await paymentService.getAllPayments();
     const totalAmount = transactions.reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);
