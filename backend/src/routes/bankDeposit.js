@@ -20,43 +20,28 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get total bank deposit amount
-router.get('/total-amount', async (req, res) => {
+//Route to return the total amount and tota transactions.
+router.get('/total', async (req, res) => {
   try {
     const transactions = await bankDepositService.getAllBankDeposits();
     const totalAmount = transactions.reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);
+    const totalTransactions = Array.isArray(transactions) ? transactions.length : 0;
     res.json({
       success: true,
       data: {
-        totalAmount: totalAmount.toFixed(2)
+        totalAmount: totalAmount.toFixed(2),
+        totalTransactions
       }
     });
   } catch (error) {
-    console.error('Error calculating total bank deposit amount:', error);
+    console.error('Error calculating bank deposits totals:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to calculate total bank deposit amount'
+      error: 'Failed to calculate bank deposits totals'
     });
   }
 });
 
-router.get('/total-transactions', async (req, res) => {
-  try {
-    const transactions = await bankDepositService.getAllBankDeposits();
-    res.json({
-      success: true,
-      data: {
-        totalTransactions: transactions.length
-      }
-    });
-  } catch (error) {
-    console.error('Error calculating total bank deposit transactions:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to calculate total bank deposit transactions'
-    });
-  }
-});
 
 // Initialize database table
 createBankDepositTable()

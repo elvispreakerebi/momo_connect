@@ -19,22 +19,24 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get total airtime amount
-router.get('/total-amount', async (req, res) => {
+//Route to return the total amount and tota transactions.
+router.get('/total', async (req, res) => {
   try {
     const transactions = await airtimeService.getAllAirtime();
     const totalAmount = transactions.reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);
+    const totalTransactions = Array.isArray(transactions) ? transactions.length : 0;
     res.json({
       success: true,
       data: {
-        totalAmount: totalAmount.toFixed(2)
+        totalAmount: totalAmount.toFixed(2),
+        totalTransactions
       }
     });
   } catch (error) {
-    console.error('Error calculating total airtime amount:', error);
+    console.error('Error calculating airtime totals:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to calculate total airtime amount'
+      error: 'Failed to calculate airtime totals'
     });
   }
 });
@@ -63,25 +65,6 @@ router.get('/process-xml', async (req, res) => {
   }
 });
 
-// Get total transactions count
-router.get('/total-transactions', async (req, res) => {
-  try {
-    const transactions = await airtimeService.getAllAirtime();
-    const totalTransactions = Array.isArray(transactions) ? transactions.length : 0;
-    res.json({
-      success: true,
-      data: {
-        totalTransactions
-      }
-    });
-  } catch (error) {
-    console.error('Error calculating total airtime transactions:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to calculate total airtime transactions'
-    });
-  }
-});
 
 // Get a specific airtime transaction by ID
 router.get('/:id', async (req, res) => {
