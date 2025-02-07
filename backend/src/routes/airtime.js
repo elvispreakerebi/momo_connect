@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-//Route to return the total amount and tota transactions.
+//Route to return the total amount and total transactions.
 router.get('/total', async (req, res) => {
   try {
     const transactions = await airtimeService.getAllAirtime();

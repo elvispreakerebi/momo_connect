@@ -19,43 +19,28 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get total bundles and packs amount
-router.get('/total-amount', async (req, res) => {
+//Route to return the total amount and total transactions.
+router.get('/total', async (req, res) => {
   try {
     const transactions = await bundlesAndPacksService.getAllBundlesAndPacks();
     const totalAmount = transactions.reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);
+    const totalTransactions = Array.isArray(transactions) ? transactions.length : 0;
     res.json({
       success: true,
       data: {
-        totalAmount: totalAmount.toFixed(2)
+        totalAmount: totalAmount.toFixed(2),
+        totalTransactions
       }
     });
   } catch (error) {
-    console.error('Error calculating total bundles and packs amount:', error);
+    console.error('Error calculating bundles and packs totals:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to calculate total bundles and packs amount'
+      error: 'Failed to calculate bundles and packs totals'
     });
   }
 });
 
-router.get('/total-transactions', async (req, res) => {
-  try {
-    const transactions = await bundlesAndPacksService.getAllBundlesAndPacks();
-    res.json({
-      success: true,
-      data: {
-        totalTransactions: transactions.length
-      }
-    });
-  } catch (error) {
-    console.error('Error calculating total bank deposit transactions:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to calculate total bank deposit transactions'
-    });
-  }
-});
 // Process XML file and save bundles and packs messages
 router.get('/process-xml', async (req, res) => {
   try {
