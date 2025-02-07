@@ -39,6 +39,23 @@ router.get('/total-amount', async (req, res) => {
   }
 });
 
+router.get('/total-transactions', async (req, res) => {
+  try {
+    const transactions = await cashPowerService.getAllCashPower();
+    res.json({
+      success: true,
+      data: {
+        totalTransactions: transactions.length
+      }
+    });
+  } catch (error) {
+    console.error('Error calculating total bank deposit transactions:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to calculate total bank deposit transactions'
+    });
+  }
+});
 // Process XML file and save cash power messages
 router.get('/process-xml', async (req, res) => {
   try {
