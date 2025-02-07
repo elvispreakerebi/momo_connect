@@ -89,4 +89,23 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+router.get('/total-transactions', async (req, res) => {
+  try {
+    const transactions = await airtimeService.getAllAirtime();
+    const totalTransactions = transactions.length;
+    res.json({
+      success: true,
+      data: {
+        totalTransactions
+      }
+    });
+  } catch (error) {
+    console.error('Error calculating total airtime transactions:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to calculate total airtime transactions'
+    });
+  }
+});
+
 module.exports = router;
