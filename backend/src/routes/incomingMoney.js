@@ -40,6 +40,23 @@ router.get('/total-amount', async (req, res) => {
   }
 });
 
+router.get('/total-transactions', async (req, res) => {
+  try {
+    const transactions = await incomingMoneyService.getAllIncomingMoney();
+    res.json({
+      success: true,
+      data: {
+        totalTransactions: transactions.length
+      }
+    });
+  } catch (error) {
+    console.error('Error calculating total bank deposit transactions:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to calculate total bank deposit transactions'
+    });
+  }
+});
 // Initialize database table
 createIncomingMoneyTable()
   .then(() => console.log('Database table initialized'))
