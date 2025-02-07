@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const cashPowerService = require('../services/cashPowerService');
+const airtimeService = require('../services/airtimeService');
 
 // Get all cash power transactions
 router.get('/', async (req, res) => {
@@ -19,43 +20,28 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Get total cash power amount
-router.get('/total-amount', async (req, res) => {
+//Route to return the total amount and total transactions.
+router.get('/total', async (req, res) => {
   try {
     const transactions = await cashPowerService.getAllCashPower();
     const totalAmount = transactions.reduce((sum, transaction) => sum + parseFloat(transaction.amount), 0);
+    const totalTransactions = Array.isArray(transactions) ? transactions.length : 0;
     res.json({
       success: true,
       data: {
-        totalAmount: totalAmount.toFixed(2)
+        totalAmount: totalAmount.toFixed(2),
+        totalTransactions
       }
     });
   } catch (error) {
-    console.error('Error calculating total cash power amount:', error);
+    console.error('Error calculating cash power totals:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to calculate total cash power amount'
+      error: 'Failed to calculate cashpower totals'
     });
   }
 });
 
-router.get('/total-transactions', async (req, res) => {
-  try {
-    const transactions = await cashPowerService.getAllCashPower();
-    res.json({
-      success: true,
-      data: {
-        totalTransactions: transactions.length
-      }
-    });
-  } catch (error) {
-    console.error('Error calculating total bank deposit transactions:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to calculate total bank deposit transactions'
-    });
-  }
-});
 // Process XML file and save cash power messages
 router.get('/process-xml', async (req, res) => {
   try {
