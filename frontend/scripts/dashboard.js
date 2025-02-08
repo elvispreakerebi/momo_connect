@@ -24,19 +24,24 @@ class Dashboard {
 
         // Transaction type filter
         const typeContainer = this.createFilterGroup('Transaction Type', 'type');
+        const typeInputs = document.createElement('div');
+        typeInputs.className = 'filter-group-inputs';
         const typeSelect = document.createElement('select');
         typeSelect.className = 'filter-input';
         typeSelect.id = 'transactionType';
-        ['All Types','Incoming Money', 'Bank Deposit', 'Payment to Code Holders', 'Transfer to Mobile Number', 'Airtime Purchase', 'Cash Power', 'Data and Bundles', 'Withdrawals From Agents'].forEach(type => {
+        ['All Types', 'Payment to Code Holders', 'Transfer to Mobile Number'].forEach(type => {
             const option = document.createElement('option');
             option.value = type === 'All Types' ? '' : type;
             option.textContent = type;
             typeSelect.appendChild(option);
         });
-        typeContainer.appendChild(typeSelect);
+        typeInputs.appendChild(typeSelect);
+        typeContainer.appendChild(typeInputs);
 
         // Date range filters
         const dateContainer = this.createFilterGroup('Date Range', 'date');
+        const dateInputs = document.createElement('div');
+        dateInputs.className = 'filter-group-inputs';
         const startDate = document.createElement('input');
         startDate.type = 'date';
         startDate.className = 'filter-input';
@@ -45,11 +50,14 @@ class Dashboard {
         endDate.type = 'date';
         endDate.className = 'filter-input';
         endDate.id = 'endDate';
-        dateContainer.appendChild(startDate);
-        dateContainer.appendChild(endDate);
+        dateInputs.appendChild(startDate);
+        dateInputs.appendChild(endDate);
+        dateContainer.appendChild(dateInputs);
 
         // Amount range filters
         const amountContainer = this.createFilterGroup('Amount Range', 'amount');
+        const amountInputs = document.createElement('div');
+        amountInputs.className = 'filter-group-inputs';
         const minAmount = document.createElement('input');
         minAmount.type = 'number';
         minAmount.className = 'filter-input';
@@ -60,8 +68,9 @@ class Dashboard {
         maxAmount.className = 'filter-input';
         maxAmount.id = 'maxAmount';
         maxAmount.placeholder = 'Max';
-        amountContainer.appendChild(minAmount);
-        amountContainer.appendChild(maxAmount);
+        amountInputs.appendChild(minAmount);
+        amountInputs.appendChild(maxAmount);
+        amountContainer.appendChild(amountInputs);
 
         // Filter button
         const filterButton = document.createElement('button');
@@ -237,5 +246,4 @@ router.addRoute('/', () => {
     const app = document.getElementById('app');
     const dashboard = new Dashboard();
     app.innerHTML = '';
-    app.appendChild(dashboard.render());
-});
+    app.appendChild(dashboard.render())
