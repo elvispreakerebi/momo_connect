@@ -29,7 +29,7 @@ class Dashboard {
         const typeSelect = document.createElement('select');
         typeSelect.className = 'filter-input';
         typeSelect.id = 'transactionType';
-        ['All Types', 'Payment to Code Holders', 'Transfer to Mobile Number'].forEach(type => {
+        ['All Types', 'Incoming Money', "Bank Deposit", "Cash Power", "bundles and packs", 'Airtime Purchase', 'Payment to Code Holders', 'Transfer to Mobile Number', "Withdrawals from Agents"].forEach(type => {
             const option = document.createElement('option');
             option.value = type === 'All Types' ? '' : type;
             option.textContent = type;

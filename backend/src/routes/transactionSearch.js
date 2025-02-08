@@ -88,7 +88,7 @@ router.post('/search', async (req, res) => {
         tableName = 'cash_power';
         break;
       case 'bundle':
-      case 'data and bundle':
+      case 'bundles and packs':
         tableName = 'bundles_and_packs';
         break;
       case 'withdrawal':
