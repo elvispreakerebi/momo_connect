@@ -20,7 +20,7 @@ class WithdrawalFromAgentService {
   async getAllWithdrawals() {
     try {
       const connection = await pool.getConnection();
-      const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM withdrawal_from_agent ORDER BY date DESC, time DESC');
+      const [rows] = await connection.query('SELECT * FROM withdrawal_from_agent ORDER BY date DESC, time DESC');
       connection.release();
       return rows;
     } catch (error) {
