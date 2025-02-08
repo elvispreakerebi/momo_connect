@@ -171,10 +171,10 @@ class Header {
             desktopFilters.forEach(filter => {
                 const clone = filter.cloneNode(true);
                 // Get the original input elements
-                const originalInput = filter.querySelector('select, input');
-                if (originalInput) {
+                const originalInputs = filter.querySelectorAll('select, input');
+                originalInputs.forEach(originalInput => {
                     // Find the corresponding cloned input
-                    const clonedInput = clone.querySelector('select, input');
+                    const clonedInput = clone.querySelector(`[id="${originalInput.id}"]`);
                     if (clonedInput) {
                         // Copy the ID and value
                         clonedInput.id = originalInput.id;
@@ -186,7 +186,7 @@ class Header {
                             });
                         }
                     }
-                }
+                });
                 mobileFilterControls.appendChild(clone);
             });
         }
@@ -204,15 +204,29 @@ class Header {
     }
 
     applyFilters() {
+        // Get transaction type from either desktop or mobile view
+        const desktopType = document.querySelector('.filter-container #transactionType');
+        const mobileType = document.querySelector('.mobile-filter-controls #transactionType');
+        const transactionType = (desktopType && desktopType.value) ? desktopType : (mobileType && mobileType.value ? mobileType : null);
+
         const filters = {
-            type: document.getElementById('transactionType')?.value || '',
+            type: transactionType ? transactionType.value : '',
             startDate: document.getElementById('startDate')?.value || '',
             endDate: document.getElementById('endDate')?.value || '',
             minAmount: document.getElementById('minAmount')?.value || '',
             maxAmount: document.getElementById('maxAmount')?.value || ''
         };
 
-        fetch(`${API_CONFIG.baseUrl}/api/transactions/search`, {
+        // Validate transaction type
+        if (!transactionType || !transactionType.value) {
+            console.error('Transaction type is required');
+            alert('Please select a transaction type');
+            return;
+        }
+
+        console.log('Applying filters:', filters);
+
+        fetch(`${API_CONFIG.baseUrl}/transactions/search`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -221,17 +235,21 @@ class Header {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Failed to fetch filtered transactions');
+                return response.json().then(error => {
+                    throw new Error(error.message || 'Failed to fetch filtered transactions');
+                });
             }
             return response.json();
         })
         .then(data => {
+            console.log('Filtered transactions:', data);
             if (this.onApplyFilters) {
                 this.onApplyFilters(data);
             }
         })
         .catch(error => {
-            console.error('Error applying filters:', error);
+            console.error('Error applying filters:', error.message);
+            alert('Error applying filters: ' + error.message);
         });
     }
 
