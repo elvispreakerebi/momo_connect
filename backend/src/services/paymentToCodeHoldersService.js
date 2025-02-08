@@ -36,7 +36,7 @@ async getAllPayments() {
 async getPaymentById(id) {
   try {
     const connection = await pool.getConnection();
-    const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM payment_to_code_holders WHERE id = ?', [id]);
+    const [rows] = await connection.query('SELECT * FROM payment_to_code_holders WHERE id = ?', [id]);
     connection.release();
     return rows[0] || null;
   } catch (error) {
