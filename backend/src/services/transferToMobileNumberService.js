@@ -136,7 +136,7 @@ class TransferToMobileNumberService {
   async getTransferById(id) {
     try {
       const connection = await pool.getConnection();
-      const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM transfer_to_mobile_number WHERE id = ?', [id]);
+      const [rows] = await connection.query('SELECT * FROM transfer_to_mobile_number WHERE id = ?', [id]);
       connection.release();
       return rows[0] || null;
     } catch (error) {
