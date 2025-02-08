@@ -20,11 +20,11 @@ class CashPowerService {
   async getAllCashPower() {
     try {
       const connection = await pool.getConnection();
-      const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM cash_power ORDER BY date DESC, time DESC');
+      const [rows] = await connection.query('SELECT * FROM cash_power ORDER BY date DESC, time DESC');
       connection.release();
       return rows;
     } catch (error) {
-      console.error('Error fetching cash power transactions:', error);
+      console.error('Error fetching bank deposit transactions:', error);
       throw error;
     }
   }
