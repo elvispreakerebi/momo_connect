@@ -217,6 +217,10 @@
     .filter-button {
         width: 100%;
     }
+
+    .filter-input[type="number"] {
+        width: 100%;
+    }
 }
 
 .filter-container {

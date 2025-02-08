@@ -231,6 +231,28 @@ class Header {
             if (this.onApplyFilters) {
                 this.onApplyFilters(data);
             }
+
+            // Reset all filter inputs
+            document.getElementById('transactionType').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('minAmount').value = '';
+            document.getElementById('maxAmount').value = '';
+
+            // Close mobile filter container after applying filters
+            if (window.innerWidth <= 784) {
+                const filterContainer = this.header.querySelector('.filter-container');
+                const chevronDown = this.header.querySelector('.chevron-down');
+                const chevronUp = this.header.querySelector('.chevron-up');
+                
+                filterContainer.classList.remove('show');
+                chevronDown.style.display = 'block';
+                chevronUp.style.display = 'none';
+                
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
         })
         .catch(error => {
             console.error('Error applying filters:', error.message);
