@@ -23,7 +23,7 @@ class TransferToMobileNumberService {
   async getAllTransfers() {
     try {
       const connection = await pool.getConnection();
-      const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM transfer_to_mobile_number ORDER BY date DESC, time DESC');
+      const [rows] = await connection.query('SELECT * FROM transfer_to_mobile_number ORDER BY date DESC, time DESC');
       connection.release();
       return rows;
     } catch (error) {
