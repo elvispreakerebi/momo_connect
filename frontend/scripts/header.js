@@ -8,7 +8,6 @@ class Header {
         this.onApplyFilters = onApplyFilters;
         this.loadLucideIcons().then(() => {
             this.setupHeader();
-            this.setupMobileFilterModal();
             this.bindEvents();
         });
     }
@@ -34,10 +33,35 @@ class Header {
     }
 
     setupHeader() {
+        // Header top section
+        const headerTop = document.createElement('div');
+        headerTop.className = 'header-top';
+
         // Title
         const title = document.createElement('h1');
         title.className = 'dashboard-title';
         title.textContent = 'Momo Dashboard';
+
+        // Mobile filter toggle button container
+        const mobileFilterBtn = document.createElement('button');
+        mobileFilterBtn.className = 'mobile-filter-button';
+        
+        // Create both chevron icons
+        const chevronDown = document.createElement('i');
+        chevronDown.setAttribute('data-lucide', 'chevron-down');
+        chevronDown.className = 'chevron-down';
+        
+        const chevronUp = document.createElement('i');
+        chevronUp.setAttribute('data-lucide', 'chevron-up');
+        chevronUp.className = 'chevron-up';
+        chevronUp.style.display = 'none';
+        
+        mobileFilterBtn.appendChild(chevronDown);
+        mobileFilterBtn.appendChild(chevronUp);
+        mobileFilterBtn.onclick = () => this.toggleMobileFilter();
+
+        headerTop.appendChild(title);
+        headerTop.appendChild(mobileFilterBtn);
 
         // Filter container
         const filterContainer = document.createElement('div');
@@ -99,21 +123,19 @@ class Header {
         filterButton.textContent = 'Apply Filters';
         filterButton.onclick = () => this.applyFilters();
 
-        // Mobile filter button
-        const mobileFilterBtn = document.createElement('button');
-        mobileFilterBtn.className = 'mobile-filter-button';
-        mobileFilterBtn.innerHTML = '<i data-lucide="filter"></i>';
-        mobileFilterBtn.onclick = () => this.toggleMobileFilter();
-
         // Append elements
         filterContainer.appendChild(typeContainer);
         filterContainer.appendChild(dateContainer);
         filterContainer.appendChild(amountContainer);
         filterContainer.appendChild(filterButton);
 
-        this.header.appendChild(title);
-        this.header.appendChild(mobileFilterBtn);
+        this.header.appendChild(headerTop);
         this.header.appendChild(filterContainer);
+
+        // Initialize Lucide icons
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     createFilterGroup(label, name) {
@@ -128,101 +150,49 @@ class Header {
         return group;
     }
 
-    setupMobileFilterModal() {
-        this.modal = document.createElement('div');
-        this.modal.className = 'mobile-filter-modal hidden';
-        this.modal.innerHTML = `
-            <div class="mobile-filter-content">
-                <div class="mobile-filter-header">
-                    <h3 class="mobile-filter-title">Filters</h3>
-                    <button class="close-filter-button" id="closeFilterModal">
-                        <i data-lucide="x"></i>
-                    </button>
-                </div>
-                <div class="mobile-filter-controls" id="mobileFilterControls"></div>
-                <button class="filter-button" id="applyMobileFilters">
-                    Apply Filters
-                </button>
-            </div>
-        `;
-        document.body.appendChild(this.modal);
+    toggleMobileFilter() {
+        const filterContainer = this.header.querySelector('.filter-container');
+        const chevronDown = this.header.querySelector('.chevron-down');
+        const chevronUp = this.header.querySelector('.chevron-up');
         
-        // Add click handler to close modal when clicking outside
-        this.modal.addEventListener('click', (e) => {
-            if (e.target === this.modal) {
-                this.modal.classList.add('hidden');
-            }
-        });
-
-        // Add media query listener for responsive behavior
-        const mediaQuery = window.matchMedia('(min-width: 768px)');
-        const handleMediaQueryChange = (e) => {
-            if (e.matches) {
-                this.modal.classList.add('hidden');
-            }
-        };
-        mediaQuery.addListener(handleMediaQueryChange);
-
-        // Initialize Lucide icons for the modal
+        // Toggle the show class on filter container
+        const isExpanded = filterContainer.classList.toggle('show');
+        
+        // Toggle visibility of chevron icons
+        chevronDown.style.display = isExpanded ? 'none' : 'block';
+        chevronUp.style.display = isExpanded ? 'block' : 'none';
+        
+        // Update Lucide icons
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
     }
 
-    toggleMobileFilter() {
-        this.modal.classList.toggle('hidden');
-        if (!this.modal.classList.contains('hidden')) {
-            const mobileFilterControls = document.getElementById('mobileFilterControls');
-            mobileFilterControls.innerHTML = '';
-            
-            // Clone desktop filters for mobile
-            const desktopFilters = Array.from(this.header.querySelectorAll('.filter-container > .filter-group'));
-            desktopFilters.forEach(filter => {
-                const clone = filter.cloneNode(true);
-                // Get the original input elements
-                const originalInputs = filter.querySelectorAll('select, input');
-                originalInputs.forEach(originalInput => {
-                    // Find the corresponding cloned input
-                    const clonedInput = clone.querySelector(`[id="${originalInput.id}"]`);
-                    if (clonedInput) {
-                        // Copy the ID and value
-                        clonedInput.id = originalInput.id;
-                        clonedInput.value = originalInput.value;
-                        // For select elements, ensure options are selected correctly
-                        if (originalInput.tagName === 'SELECT') {
-                            Array.from(originalInput.options).forEach((opt, index) => {
-                                clonedInput.options[index].selected = opt.selected;
-                            });
-                        }
-                    }
-                });
-                mobileFilterControls.appendChild(clone);
-            });
-        }
-    }
-
     bindEvents() {
-        const closeButton = document.getElementById('closeFilterModal');
-        if (closeButton) {
-            closeButton.addEventListener('click', () => {
-                this.modal.classList.add('hidden');
-            });
-        }
-
-        const applyMobileFilters = document.getElementById('applyMobileFilters');
-        if (applyMobileFilters) {
-            applyMobileFilters.addEventListener('click', () => {
-                this.applyFilters();
-                this.modal.classList.add('hidden');
-            });
-        }
+        // Add media query listener for responsive behavior
+        const mediaQuery = window.matchMedia('(min-width: 784px)');
+        const handleMediaQueryChange = (e) => {
+            if (e.matches) {
+                const filterContainer = this.header.querySelector('.filter-container');
+                const chevronDown = this.header.querySelector('.chevron-down');
+                const chevronUp = this.header.querySelector('.chevron-up');
+                
+                filterContainer.classList.remove('show');
+                chevronDown.style.display = 'block';
+                chevronUp.style.display = 'none';
+                
+                if (typeof lucide !== 'undefined') {
+                    lucide.createIcons();
+                }
+            }
+        };
+        mediaQuery.addListener(handleMediaQueryChange);
+        // Initial check
+        handleMediaQueryChange(mediaQuery);
     }
 
     applyFilters() {
-        // Get transaction type from either desktop or mobile view
-        const desktopType = document.querySelector('.filter-container #transactionType');
-        const mobileType = document.querySelector('.mobile-filter-controls #transactionType');
-        const transactionType = (desktopType && desktopType.value) ? desktopType : (mobileType && mobileType.value ? mobileType : null);
+        const transactionType = document.getElementById('transactionType');
 
         const filters = {
             type: transactionType ? transactionType.value : '',
@@ -240,11 +210,6 @@ class Header {
         }
 
         console.log('Applying filters:', filters);
-
-        // Close the mobile filter modal if it exists
-        if (this.modal) {
-            this.modal.classList.add('hidden');
-        }
 
         fetch(`${API_CONFIG.baseUrl}/transactions/search`, {
             method: 'POST',
