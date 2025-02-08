@@ -1,3 +1,5 @@
+import {  API_CONFIG } from './config.js';
+
 // Dashboard component
 class Dashboard {
     constructor() {
@@ -179,7 +181,7 @@ class Dashboard {
         try {
             this.mainContent.innerHTML = '<div class="text-center">Loading transactions...</div>';
             
-            const response = await fetch('localhost:4000/transactions/search', {
+            const response = await fetch(`${API_CONFIG.baseUrl}/transactions/search`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
