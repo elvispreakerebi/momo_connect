@@ -24,7 +24,7 @@ class CashPowerService {
       connection.release();
       return rows;
     } catch (error) {
-      console.error('Error fetching bank deposit transactions:', error);
+      console.error('Error fetching cash power transactions:', error);
       throw error;
     }
   }

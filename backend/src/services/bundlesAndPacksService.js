@@ -19,17 +19,15 @@ async saveBundlesAndPacks(data) {
 
 async getAllBundlesAndPacks() {
     try {
-    const connection = await pool.getConnection();
-    const [rows] = await connection.query(
-        'SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM bundles_and_packs ORDER BY date DESC, time DESC'
-    );
-    connection.release();
-    return rows;
+      const connection = await pool.getConnection();
+      const [rows] = await connection.query('SELECT * FROM bundles_and_packs ORDER BY date DESC, time DESC');
+      connection.release();
+      return rows;
     } catch (error) {
-    console.error('Error fetching bundles and packs transactions:', error);
-    throw error;
+      console.error('Error fetching bundles and packs transactions:', error);
+      throw error;
     }
-}
+  }
 
 async getBundleById(id) {
   try {
