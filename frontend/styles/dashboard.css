@@ -56,6 +56,12 @@
     flex-direction: column;
 }
 
+.filter-group-inputs {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+}
+
 .filter-label {
     font-size: 0.875rem;
     font-weight: 500;
