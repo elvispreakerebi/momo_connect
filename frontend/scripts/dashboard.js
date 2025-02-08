@@ -1,4 +1,3 @@
-import { API_CONFIG } from './config.js';
 import Header from './header.js';
 
 // Dashboard component

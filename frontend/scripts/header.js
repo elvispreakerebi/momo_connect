@@ -1,25 +1,33 @@
 
+import { API_CONFIG } from './config.js';
+
 class Header {
     constructor(onApplyFilters) {
         this.header = document.createElement('header');
         this.header.className = 'dashboard-header';
         this.onApplyFilters = onApplyFilters;
-        this.loadLucideIcons();
-        this.setupHeader();
-        this.setupMobileFilterModal();
-        this.bindEvents();
+        this.loadLucideIcons().then(() => {
+            this.setupHeader();
+            this.setupMobileFilterModal();
+            this.bindEvents();
+        });
     }
 
     async loadLucideIcons() {
         try {
             const script = document.createElement('script');
             script.src = 'https://unpkg.com/lucide@latest';
-            document.head.appendChild(script);
             await new Promise((resolve, reject) => {
-                script.onload = resolve;
+                script.onload = () => {
+                    if (typeof lucide !== 'undefined') {
+                        resolve();
+                    } else {
+                        reject(new Error('Lucide failed to load'));
+                    }
+                };
                 script.onerror = reject;
+                document.head.appendChild(script);
             });
-            lucide.createIcons();
         } catch (error) {
             console.error('Failed to load Lucide icons:', error);
         }
@@ -138,6 +146,18 @@ class Header {
             </div>
         `;
         document.body.appendChild(this.modal);
+        
+        // Add click handler to close modal when clicking outside
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal) {
+                this.modal.classList.add('hidden');
+            }
+        });
+
+        // Initialize Lucide icons for the modal
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     toggleMobileFilter() {
@@ -147,10 +167,26 @@ class Header {
             mobileFilterControls.innerHTML = '';
             
             // Clone desktop filters for mobile
-            const desktopFilters = Array.from(this.header.querySelectorAll('.filter-container > div'));
+            const desktopFilters = Array.from(this.header.querySelectorAll('.filter-container > .filter-group'));
             desktopFilters.forEach(filter => {
                 const clone = filter.cloneNode(true);
-                clone.className = 'filter-group';
+                // Get the original input elements
+                const originalInput = filter.querySelector('select, input');
+                if (originalInput) {
+                    // Find the corresponding cloned input
+                    const clonedInput = clone.querySelector('select, input');
+                    if (clonedInput) {
+                        // Copy the ID and value
+                        clonedInput.id = originalInput.id;
+                        clonedInput.value = originalInput.value;
+                        // For select elements, ensure options are selected correctly
+                        if (originalInput.tagName === 'SELECT') {
+                            Array.from(originalInput.options).forEach((opt, index) => {
+                                clonedInput.options[index].selected = opt.selected;
+                            });
+                        }
+                    }
+                }
                 mobileFilterControls.appendChild(clone);
             });
         }
@@ -176,9 +212,27 @@ class Header {
             maxAmount: document.getElementById('maxAmount')?.value || ''
         };
 
-        if (this.onApplyFilters) {
-            this.onApplyFilters(filters);
-        }
+        fetch(`${API_CONFIG.baseUrl}/api/transactions/search`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(filters)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to fetch filtered transactions');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (this.onApplyFilters) {
+                this.onApplyFilters(data);
+            }
+        })
+        .catch(error => {
+            console.error('Error applying filters:', error);
+        });
     }
 
     render() {
