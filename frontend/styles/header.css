@@ -180,6 +180,18 @@
     z-index: 20;
 }
 
+.mobile-filter-modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .mobile-filter-modal {
+        display: none;
+    }
+}
+
 .mobile-filter-content {
     width: 100%;
     max-width: 100%;
@@ -234,6 +246,7 @@
 
 .close-filter-button {
     color: var(--color-gray-500);
+    cursor: pointer;
 }
 
 .close-filter-button:hover {

@@ -154,6 +154,15 @@ class Header {
             }
         });
 
+        // Add media query listener for responsive behavior
+        const mediaQuery = window.matchMedia('(min-width: 768px)');
+        const handleMediaQueryChange = (e) => {
+            if (e.matches) {
+                this.modal.classList.add('hidden');
+            }
+        };
+        mediaQuery.addListener(handleMediaQueryChange);
+
         // Initialize Lucide icons for the modal
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
@@ -193,14 +202,20 @@ class Header {
     }
 
     bindEvents() {
-        document.getElementById('closeFilterModal').onclick = () => {
-            this.modal.classList.add('hidden');
-        };
+        const closeButton = document.getElementById('closeFilterModal');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                this.modal.classList.add('hidden');
+            });
+        }
 
-        document.getElementById('applyMobileFilters').onclick = () => {
-            this.applyFilters();
-            this.modal.classList.add('hidden');
-        };
+        const applyMobileFilters = document.getElementById('applyMobileFilters');
+        if (applyMobileFilters) {
+            applyMobileFilters.addEventListener('click', () => {
+                this.applyFilters();
+                this.modal.classList.add('hidden');
+            });
+        }
     }
 
     applyFilters() {
@@ -225,6 +240,11 @@ class Header {
         }
 
         console.log('Applying filters:', filters);
+
+        // Close the mobile filter modal if it exists
+        if (this.modal) {
+            this.modal.classList.add('hidden');
+        }
 
         fetch(`${API_CONFIG.baseUrl}/transactions/search`, {
             method: 'POST',
