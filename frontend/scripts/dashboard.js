@@ -179,12 +179,14 @@ class Dashboard {
         try {
             this.mainContent.innerHTML = '<div class="text-center">Loading transactions...</div>';
             
-            const queryParams = new URLSearchParams();
-            Object.entries(filters).forEach(([key, value]) => {
-                if (value) queryParams.append(key, value);
+            const response = await fetch('localhost:4000/transactions/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(filters)
             });
 
-            const response = await fetch(`/api/transactions/filter?${queryParams}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
