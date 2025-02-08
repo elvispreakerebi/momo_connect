@@ -32,7 +32,7 @@ async getAllBundlesAndPacks() {
 async getBundleById(id) {
   try {
     const connection = await pool.getConnection();
-    const [rows] = await connection.query('SELECT *, CONCAT(date, " ", time) as transaction_datetime FROM bundles_and_packs WHERE id = ?', [id]);
+    const [rows] = await connection.query('SELECT * FROM bundles_and_packs WHERE id = ?', [id]);
     connection.release();
     return rows[0] || null;
   } catch (error) {
