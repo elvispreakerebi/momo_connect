@@ -34,7 +34,15 @@ async function initializeDatabase() {
     console.error('Database connection details:', {
       host: process.env.DB_HOST,
       user: process.env.DB_USER,
-      database: process.env.DB_NAME
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+      ssl: {
+        rejectUnauthorized: true
+      },
+      connectTimeout: 30000, // 30 seconds
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0
     });
     throw error;
   }

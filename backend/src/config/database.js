@@ -1,19 +1,32 @@
-const mysql = require('mysql2/promise');
-const dotenv = require('dotenv');
+const mysql = require('mysql2');
+require('dotenv').config();
 
-dotenv.config();
-
-// Create connection pool
 const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME || 'momo_connect',
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT || 19926,
+  ssl: {
+    rejectUnauthorized: false, // Changed to false to accept self-signed certificates
+    minVersion: 'TLSv1.2'
+  },
+  connectTimeout: 60000,
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  enableKeepAlive: true,
-  keepAliveInitialDelay: 0
+  connectionLimit: 5,
+  queueLimit: 0
 });
 
-module.exports = pool;
+const promisePool = pool.promise();
+
+// Test the connection
+promisePool.getConnection()
+  .then(connection => {
+    console.log('Database connection established successfully');
+    connection.release();
+  })
+  .catch(err => {
+    console.error('Error connecting to the database:', err);
+  });
+
+module.exports = promisePool;
