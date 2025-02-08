@@ -246,4 +246,5 @@ router.addRoute('/', () => {
     const app = document.getElementById('app');
     const dashboard = new Dashboard();
     app.innerHTML = '';
-    app.appendChild(dashboard.render())
+    app.appendChild(dashboard.render());
+});
