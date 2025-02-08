@@ -1,3 +1,5 @@
+import Dashboard from './dashboard.js';
+
 // Router for handling SPA navigation
 class Router {
     constructor() {
@@ -25,6 +27,14 @@ class Router {
     }
 
     init() {
+        // Register the default route
+        this.addRoute('/', () => {
+            const app = document.getElementById('app');
+            const dashboard = new Dashboard();
+            app.innerHTML = '';
+            app.appendChild(dashboard.render());
+        });
+        
         this.handleRoute();
     }
 }
