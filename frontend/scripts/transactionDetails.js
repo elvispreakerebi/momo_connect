@@ -117,13 +117,13 @@ class TransactionDetails {
 
         // Add all other transaction properties except id and those already displayed
         Object.entries(transaction).forEach(([key, value]) => {
-            if (key !== 'id' && key !== 'amount' && key !== 'timestamp') {
+            if (key !== 'id' && key !== 'amount' && key !== 'timestamp' && key !== 'created_at') {
                 const detailItem = document.createElement('div');
                 detailItem.className = 'transaction-info-item';
                 
                 const label = document.createElement('span');
                 label.className = 'info-label';
-                label.textContent = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                label.textContent = key.replace(/_/g, ' ').replace(/\w/g, l => l.toUpperCase());
                 
                 const value = document.createElement('span');
                 value.className = 'info-value';
