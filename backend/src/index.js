@@ -34,7 +34,7 @@ app.get('/', (req, res) => {
 
 // Routes
 app.use('/incoming-money', incomingMoneyRoutes);
-app.use('/payment-to-code-holder', paymentToCodeHolderRoutes);
+app.use('/payment-to-code-holders', paymentToCodeHolderRoutes);
 app.use('/transfer-to-mobile-number', transferToMobileNumberRoutes);
 app.use('/airtime', airtimeRoutes)
 app.use('/cash-power', cashPowerRoutes)
