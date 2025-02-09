@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="styles/transactions.css">
     <link rel="stylesheet" href="styles/transactionList.css">
     <link rel="stylesheet" href="styles/transactionDetails.css">
+    <link rel="stylesheet" href="styles/filteredTransactions.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,6 +19,13 @@
 <body class="font-inter bg-gray-50">
     <div id="app">
         <!-- Content will be dynamically injected here -->
+        <div class="filtered-transactions-container">
+            <div class="filtered-transactions-list"></div>
+            <div class="clear-filters-bar">
+                <button class="clear-filters-button">Clear</button>
+            </div>
+        </div>
+        <div class="snackbar">No transactions found</div>
     </div>
     
     <!-- Scripts -->

@@ -228,31 +228,110 @@ class Header {
         })
         .then(data => {
             console.log('Filtered transactions:', data);
-            if (this.onApplyFilters) {
-                this.onApplyFilters(data);
+            const transactions = data.transactions || [];
+            
+            // Ensure filtered transactions container exists
+            let filteredContainer = document.querySelector('.filtered-transactions-container');
+            if (!filteredContainer) {
+                filteredContainer = document.createElement('div');
+                filteredContainer.className = 'filtered-transactions-container';
+                document.getElementById('app').appendChild(filteredContainer);
             }
 
-            // Reset all filter inputs
-            document.getElementById('transactionType').value = '';
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-            document.getElementById('minAmount').value = '';
-            document.getElementById('maxAmount').value = '';
+            // Ensure filtered list exists
+            let filteredList = filteredContainer.querySelector('.filtered-transactions-list');
+            if (!filteredList) {
+                filteredList = document.createElement('div');
+                filteredList.className = 'filtered-transactions-list';
+                filteredContainer.appendChild(filteredList);
+            }
 
-            // Close mobile filter container after applying filters
-            if (window.innerWidth <= 784) {
-                const filterContainer = this.header.querySelector('.filter-container');
-                const chevronDown = this.header.querySelector('.chevron-down');
-                const chevronUp = this.header.querySelector('.chevron-up');
-                
-                filterContainer.classList.remove('show');
-                chevronDown.style.display = 'block';
-                chevronUp.style.display = 'none';
-                
-                if (typeof lucide !== 'undefined') {
-                    lucide.createIcons();
+            // Ensure clear filters bar exists
+            let clearFiltersBar = filteredContainer.querySelector('.clear-filters-bar');
+            if (!clearFiltersBar) {
+                clearFiltersBar = document.createElement('div');
+                clearFiltersBar.className = 'clear-filters-bar';
+                const clearButton = document.createElement('button');
+                clearButton.className = 'clear-filters-button';
+                clearButton.textContent = 'Clear';
+                clearFiltersBar.appendChild(clearButton);
+                filteredContainer.appendChild(clearFiltersBar);
+            }
+
+            const snackbar = document.querySelector('.snackbar');
+            const mainContent = document.querySelector('.main-content');
+
+            // Show filtered container
+            filteredContainer.classList.add('show');
+            filteredContainer.style.top = this.header.offsetHeight + 'px';
+
+            if (transactions.length === 0) {
+                if (snackbar) {
+                    snackbar.classList.add('show');
+                    setTimeout(() => {
+                        snackbar.classList.remove('show');
+                    }, 5000);
                 }
+                return;
             }
+
+            // Clear previous results
+            filteredList.innerHTML = '';
+
+            // Hide main content if it exists
+            if (mainContent) {
+                mainContent.style.display = 'none';
+            }
+
+            // Create transaction cards
+            transactions.forEach(transaction => {
+                const card = document.createElement('div');
+                card.className = 'transaction-item-card';
+                card.style.cursor = 'pointer';
+
+                const amount = document.createElement('div');
+                amount.className = 'transaction-amount';
+                amount.textContent = parseFloat(transaction.amount).toLocaleString('en-US', {
+                    style: 'currency',
+                    currency: 'RWF'
+                });
+
+                const dateTime = document.createElement('div');
+                dateTime.className = 'transaction-datetime';
+                const timestamp = transaction.date ? new Date(transaction.date) : new Date();
+                if (isNaN(timestamp.getTime())) {
+                    dateTime.textContent = 'Date not available';
+                } else {
+                    dateTime.textContent = timestamp.toLocaleString('en-US', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short'
+                    });
+                }
+
+                card.appendChild(amount);
+                card.appendChild(dateTime);
+
+                card.addEventListener('click', () => {
+                    window.location.hash = `/transaction/${transaction.id}`;
+                });
+
+                filteredList.appendChild(card);
+            });
+
+            // Setup clear filters button
+            const clearButton = document.querySelector('.clear-filters-button');
+            clearButton.onclick = () => {
+                filteredContainer.classList.remove('show');
+                mainContent.style.display = 'block';
+                filteredList.innerHTML = '';
+                
+                // Reset all filter inputs
+                document.getElementById('transactionType').value = '';
+                document.getElementById('startDate').value = '';
+                document.getElementById('endDate').value = '';
+                document.getElementById('minAmount').value = '';
+                document.getElementById('maxAmount').value = '';
+            };
         })
         .catch(error => {
             console.error('Error applying filters:', error.message);

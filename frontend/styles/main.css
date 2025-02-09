@@ -38,10 +38,25 @@
 /* Base Styles */
 body {
     margin: 0;
-    padding: 0;
     font-family: 'Inter', sans-serif;
-    color: var(--text-primary);
-    background-color: var(--background-color);
+}
+
+#app {
+    position: relative;
+    min-height: 100vh;
+}
+
+.main-content {
+    position: relative;
+    z-index: 1;
+}
+
+.filtered-transactions-container {
+    z-index: 2;
+}
+
+.dashboard-header {
+    z-index: 3;
 }
 
 /* Utility Classes */
