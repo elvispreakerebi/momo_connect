@@ -17,6 +17,7 @@ class TransactionList {
         const backButton = document.createElement('button');
         backButton.className = 'back-button';
         const arrowIcon = document.createElement('i');
+        arrowIcon.className = 'lucide lucide-chevron-left';
         arrowIcon.setAttribute('data-lucide', 'chevron-left');
         backButton.appendChild(arrowIcon);
         backButton.addEventListener('click', () => {
@@ -31,8 +32,8 @@ class TransactionList {
         header.appendChild(title);
         this.container.appendChild(header);
 
-        // Initialize Lucide icons
-        lucide.createIcons();
+        // Initialize Lucide icons after DOM elements are added
+        setTimeout(() => lucide.createIcons(), 0);
     }
 
     setupTransactionList() {
