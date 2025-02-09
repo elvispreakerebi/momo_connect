@@ -230,6 +230,23 @@ class Header {
             console.log('Filtered transactions:', data);
             const transactions = data.transactions || [];
             
+            // Clear input fields after successful response
+            document.getElementById('transactionType').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('minAmount').value = '';
+            document.getElementById('maxAmount').value = '';
+
+            // Hide filter container on mobile
+            const filterContainer = this.header.querySelector('.filter-container');
+            filterContainer.classList.remove('show');
+            
+            // Reset chevron icons
+            const chevronDown = this.header.querySelector('.chevron-down');
+            const chevronUp = this.header.querySelector('.chevron-up');
+            chevronDown.style.display = 'block';
+            chevronUp.style.display = 'none';
+            
             // Ensure filtered transactions container exists
             let filteredContainer = document.querySelector('.filtered-transactions-container');
             if (!filteredContainer) {
