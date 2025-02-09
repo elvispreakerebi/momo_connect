@@ -1,5 +1,6 @@
 import Dashboard from './dashboard.js';
 import TransactionList from './transactionList.js';
+import TransactionDetails from './transactionDetails.js';
 
 // Router for handling SPA navigation
 class Router {
@@ -22,6 +23,20 @@ class Router {
     handleRoute() {
         const hash = window.location.hash || '#/';
         const path = hash.slice(1); // Remove the # from the hash
+
+        // Check for transaction details routes
+        const transactionDetailsMatch = path.match(/^\/transactions\/([\w-]+)\/([\w-]+)$/);
+        if (transactionDetailsMatch) {
+            const transactionType = transactionDetailsMatch[1].split('-').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+            const transactionId = transactionDetailsMatch[2];
+            const app = document.getElementById('app');
+            const transactionDetails = new TransactionDetails(transactionType, transactionId);
+            app.innerHTML = '';
+            app.appendChild(transactionDetails.render());
+            return;
+        }
 
         // Check for transaction list routes
         const transactionMatch = path.match(/^\/transactions\/([\w-]+)$/);

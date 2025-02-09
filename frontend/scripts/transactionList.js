@@ -44,6 +44,7 @@ class TransactionList {
     createTransactionCard(transaction) {
         const card = document.createElement('div');
         card.className = 'transaction-item-card';
+        card.style.cursor = 'pointer';
 
         const amount = document.createElement('div');
         amount.className = 'transaction-amount';
@@ -66,6 +67,11 @@ class TransactionList {
 
         card.appendChild(amount);
         card.appendChild(dateTime);
+
+        card.addEventListener('click', () => {
+            const route = this.transactionType.toLowerCase().replace(/ /g, '-');
+            window.location.hash = `/transactions/${route}/${transaction.id}`;
+        });
 
         return card;
     }
