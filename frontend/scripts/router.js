@@ -24,6 +24,28 @@ class Router {
         const hash = window.location.hash || '#/';
         const path = hash.slice(1); // Remove the # from the hash
 
+        // Check for filtered transaction details routes
+        const filteredTransactionMatch = path.match(/^\/transaction\/(\w+-?\w+)$/);
+        if (filteredTransactionMatch) {
+            const transactionId = filteredTransactionMatch[1];
+            const app = document.getElementById('app');
+            const filteredContainer = document.querySelector('.filtered-transactions-container');
+            const mainContent = document.querySelector('.main-content');
+
+            // Hide filtered container and main content
+            if (filteredContainer) {
+                filteredContainer.classList.remove('show');
+            }
+            if (mainContent) {
+                mainContent.style.display = 'none';
+            }
+
+            const transactionDetails = new TransactionDetails(null, transactionId);
+            app.innerHTML = '';
+            app.appendChild(transactionDetails.render());
+            return;
+        }
+
         // Check for transaction details routes
         const transactionDetailsMatch = path.match(/^\/transactions\/([\w-]+)\/([\w-]+)$/);
         if (transactionDetailsMatch) {

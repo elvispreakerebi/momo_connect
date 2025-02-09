@@ -191,7 +191,7 @@ class Header {
         handleMediaQueryChange(mediaQuery);
     }
 
-    applyFilters() {
+    applyFilters(page = 1) {
         const transactionType = document.getElementById('transactionType');
 
         const filters = {
@@ -199,7 +199,8 @@ class Header {
             startDate: document.getElementById('startDate')?.value || '',
             endDate: document.getElementById('endDate')?.value || '',
             minAmount: document.getElementById('minAmount')?.value || '',
-            maxAmount: document.getElementById('maxAmount')?.value || ''
+            maxAmount: document.getElementById('maxAmount')?.value || '',
+            page: page
         };
 
         // Validate transaction type
@@ -324,11 +325,45 @@ class Header {
                 card.appendChild(dateTime);
 
                 card.addEventListener('click', () => {
-                    window.location.hash = `/transaction/${transaction.id}`;
+                    window.router.navigateTo(`/transaction/${transaction.id}`);
                 });
 
                 filteredList.appendChild(card);
             });
+
+            // Remove existing pagination controls if any
+            const existingPaginationControls = filteredContainer.querySelector('.pagination-controls');
+            if (existingPaginationControls) {
+                existingPaginationControls.remove();
+            }
+
+            // Add pagination controls if total pages > 1
+            if (data.totalPages > 1) {
+                const paginationContainer = document.createElement('div');
+                paginationContainer.className = 'pagination-controls';
+
+                const prevButton = document.createElement('button');
+                prevButton.className = 'pagination-button';
+                prevButton.textContent = 'Previous';
+                prevButton.disabled = data.currentPage === 1;
+                prevButton.onclick = () => this.applyFilters(data.currentPage - 1);
+
+                const pageInfo = document.createElement('span');
+                pageInfo.className = 'page-info';
+                pageInfo.textContent = `Page ${data.currentPage} of ${data.totalPages}`;
+
+                const nextButton = document.createElement('button');
+                nextButton.className = 'pagination-button';
+                nextButton.textContent = 'Next';
+                nextButton.disabled = data.currentPage === data.totalPages;
+                nextButton.onclick = () => this.applyFilters(data.currentPage + 1);
+
+                paginationContainer.appendChild(prevButton);
+                paginationContainer.appendChild(pageInfo);
+                paginationContainer.appendChild(nextButton);
+
+                filteredContainer.insertBefore(paginationContainer, clearFiltersBar);
+            }
 
             // Setup clear filters button
             const clearButton = document.querySelector('.clear-filters-button');
