@@ -230,12 +230,7 @@ class Header {
             console.log('Filtered transactions:', data);
             const transactions = data.transactions || [];
             
-            // Clear input fields after successful response
-            document.getElementById('transactionType').value = '';
-            document.getElementById('startDate').value = '';
-            document.getElementById('endDate').value = '';
-            document.getElementById('minAmount').value = '';
-            document.getElementById('maxAmount').value = '';
+            // Keep the filter values in the input fields
 
             // Hide filter container on mobile
             const filterContainer = this.header.querySelector('.filter-container');
