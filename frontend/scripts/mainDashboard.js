@@ -42,6 +42,7 @@ class MainDashboard {
     createTransactionCard(type) {
         const card = document.createElement('div');
         card.className = 'card transaction-card';
+        card.style.cursor = 'pointer';
         card.innerHTML = `
             <h3 class="card-title">${type}</h3>
             <div class="card-content">
@@ -54,6 +55,12 @@ class MainDashboard {
                 </div>
             </div>
         `;
+
+        card.addEventListener('click', () => {
+            const route = type.toLowerCase().replace(/ /g, '-');
+            window.location.hash = `#/transactions/${route}`;
+        });
+
         return card;
     }
 
