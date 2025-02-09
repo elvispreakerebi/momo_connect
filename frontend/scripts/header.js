@@ -325,7 +325,8 @@ class Header {
                 card.appendChild(dateTime);
 
                 card.addEventListener('click', () => {
-                    window.router.navigateTo(`/transaction/${transaction.id}`);
+                    const transactionType = transaction.type || 'Filtered';
+                    window.location.hash = `/transactions/${transactionType.toLowerCase().replace(/ /g, '-')}/${transaction.id}`;
                 });
 
                 filteredList.appendChild(card);

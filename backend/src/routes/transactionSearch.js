@@ -137,4 +137,64 @@ router.post('/search', async (req, res) => {
   }
 });
 
+// Get details of a specific filtered transaction by ID
+router.get('/:id', async (req, res) => {
+  let connection;
+  try {
+    const { id } = req.params;
+    connection = await pool.getConnection();
+
+    // Query each table to find the transaction
+    const tables = [
+      'incoming_money',
+      'bank_deposit',
+      'payment_to_code_holders',
+      'transfer_to_mobile_number',
+      'airtime',
+      'cash_power',
+      'bundles_and_packs',
+      'withdrawal_from_agent'
+    ];
+
+    for (const table of tables) {
+      const [results] = await executeQueryWithRetry(
+        connection,
+        `SELECT *, '${table}' as type FROM ${table} WHERE id = ?`,
+        [id]
+      );
+
+      if (results && results.length > 0) {
+        // Map table names to frontend-friendly transaction types
+        const typeMap = {
+          'incoming_money': 'Incoming Money',
+          'bank_deposit': 'Bank Deposit',
+          'payment_to_code_holders': 'Payment to Code Holder',
+          'transfer_to_mobile_number': 'Transfer to Mobile Number',
+          'airtime': 'Airtime Purchase',
+          'cash_power': 'Cash Power',
+          'bundles_and_packs': 'bundles and packs',
+          'withdrawal_from_agent': 'Withdrawals from Agents'
+        };
+
+        const transaction = results[0];
+        transaction.type = typeMap[table];
+
+        return res.json(transaction);
+      }
+    }
+
+    res.status(404).json({ error: 'Transaction not found' });
+  } catch (error) {
+    console.error('Error fetching transaction details:', error);
+    res.status(500).json({
+      error: 'Internal server error',
+      details: error.code === 'ECONNRESET' ? 'Database connection was reset. Please try again.' : 'An unexpected error occurred.'
+    });
+  } finally {
+    if (connection) {
+      connection.release();
+    }
+  }
+});
+
 module.exports = router;

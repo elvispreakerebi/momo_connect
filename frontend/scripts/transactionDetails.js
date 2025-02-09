@@ -22,7 +22,12 @@ class TransactionDetails {
         arrowIcon.setAttribute('data-lucide', 'chevron-left');
         backButton.appendChild(arrowIcon);
         backButton.addEventListener('click', () => {
-            window.location.hash = `/transactions/${this.transactionType.toLowerCase().replace(/ /g, '-')}`;
+            // Check if this is a filtered transaction
+            if (this.transactionType.toLowerCase() === 'filtered') {
+                window.location.hash = '#/';
+            } else {
+                window.location.hash = `/transactions/${this.transactionType.toLowerCase().replace(/ /g, '-')}`;
+            }
         });
 
         const title = document.createElement('h2');
@@ -59,15 +64,45 @@ class TransactionDetails {
     async fetchTransactionDetails() {
         try {
             this.showLoading();
-            const endpoint = this.transactionType.toLowerCase().replace(/ /g, '-');
+            let endpoint;
+            
+            // For filtered transactions, determine the endpoint based on the transaction type
+            if (this.transactionType.toLowerCase() === 'filtered') {
+                // Use a fetch to first get the transaction type from the search endpoint
+                const searchResponse = await fetch(`${API_CONFIG.baseUrl}/transactions/${this.transactionId}`);
+                
+                if (!searchResponse.ok) {
+                    throw new Error(`Failed to fetch transaction type: ${searchResponse.status}`);
+                }
+                
+                const searchData = await searchResponse.json();
+                const transactionType = searchData.type;
+                
+                // Map the transaction type to the correct endpoint
+                const transactionTypeMap = {
+                    'Incoming Money': 'incoming-money',
+                    'Bank Deposit': 'bank-deposit',
+                    'Payment to Code Holder': 'payment-to-code-holders',
+                    'Transfer to Mobile Number': 'transfer-to-mobile-number',
+                    'Airtime Purchase': 'airtime',
+                    'Cash Power': 'cash-power',
+                    'bundles and packs': 'bundles-and-packs',
+                    'Withdrawals from Agents': 'withdrawal-from-agent'
+                };
+                
+                endpoint = transactionTypeMap[transactionType] || 'transactions';
+            } else {
+                endpoint = this.transactionType.toLowerCase().replace(/ /g, '-');
+            }
+            
             const response = await fetch(`${API_CONFIG.baseUrl}/${endpoint}/${this.transactionId}`);
             
             if (!response.ok) {
-                throw new Error(`Failed to fetch transaction details`);
+                throw new Error(`Failed to fetch transaction details: ${response.status}`);
             }
 
             const data = await response.json();
-            this.renderDetails(data.data);
+            this.renderDetails(data.data || data);
         } catch (error) {
             console.error('Error fetching transaction details:', error);
             this.showError('Failed to load transaction details');
