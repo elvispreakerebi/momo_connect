@@ -8,7 +8,7 @@ export async function fetchTransactionVolume() {
             { type: 'Bundles and Packs', endpoint: 'bundles-and-packs' },
             { type: 'Cash Power', endpoint: 'cash-power' },
             { type: 'Incoming Money', endpoint: 'incoming-money' },
-            { type: 'Payment to Code Holders', endpoint: 'payment-to-code-holder' },
+            { type: 'Payment to Code Holders', endpoint: 'payment-to-code-holders' },
             { type: 'Transfer to Mobile Number', endpoint: 'transfer-to-mobile-number' },
             { type: 'Withdrawal from Agent', endpoint: 'withdrawal-from-agent' }
         ];

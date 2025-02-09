@@ -58,7 +58,7 @@ class MainDashboard {
 
         card.addEventListener('click', () => {
             const route = type.toLowerCase().replace(/ /g, '-');
-            window.location.hash = `#/transactions/${route}`;
+            window.location.hash = `/transactions/${route}`;
         });
 
         return card;
