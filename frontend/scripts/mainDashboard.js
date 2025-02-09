@@ -10,7 +10,7 @@ class MainDashboard {
             'Bundles and Packs',
             'Cash Power',
             'Incoming Money',
-            'Payment to Code Holders',
+            'Payment to Code Holder',
             'Transfer to Mobile Number',
             'Withdrawal from Agent'
         ];

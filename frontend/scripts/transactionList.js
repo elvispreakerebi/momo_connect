@@ -16,7 +16,9 @@ class TransactionList {
 
         const backButton = document.createElement('button');
         backButton.className = 'back-button';
-        backButton.innerHTML = '<i data-lucide="arrow-left"></i>';
+        const arrowIcon = document.createElement('i');
+        arrowIcon.setAttribute('data-lucide', 'chevron-left');
+        backButton.appendChild(arrowIcon);
         backButton.addEventListener('click', () => {
             window.location.hash = '#/';
         });
@@ -68,8 +70,17 @@ class TransactionList {
         return card;
     }
 
+    showLoading() {
+        const loadingElement = document.createElement('div');
+        loadingElement.className = 'loading-spinner';
+        loadingElement.innerHTML = '<div class="spinner"></div>';
+        this.transactionListElement.innerHTML = '';
+        this.transactionListElement.appendChild(loadingElement);
+    }
+
     async fetchTransactions() {
         try {
+            this.showLoading();
             const endpoint = this.transactionType.toLowerCase().replace(/ /g, '-');
             const response = await fetch(`${API_CONFIG.baseUrl}/${endpoint}`);
             
