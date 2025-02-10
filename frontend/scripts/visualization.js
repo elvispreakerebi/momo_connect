@@ -7,6 +7,48 @@ document.addEventListener('DOMContentLoaded', initializeCharts);
 
 async function initializeCharts() {
     try {
+        // Create container structure
+        const visualizationContainer = document.createElement('div');
+        visualizationContainer.className = 'visualization-container';
+
+        // Create bar chart section
+        const barChartSection = document.createElement('div');
+        barChartSection.className = 'bar-chart-section';
+        const barChartContainer = document.createElement('div');
+        barChartContainer.className = 'chart-container';
+        const barCanvas = document.createElement('canvas');
+        barCanvas.id = 'transactionVolumeChart';
+        barChartContainer.appendChild(barCanvas);
+        barChartSection.appendChild(barChartContainer);
+
+        // Create charts row section for line and pie charts
+        const chartsRowSection = document.createElement('div');
+        chartsRowSection.className = 'charts-row-section';
+
+        // Create line chart container
+        const lineChartContainer = document.createElement('div');
+        lineChartContainer.className = 'chart-container';
+        const lineCanvas = document.createElement('canvas');
+        lineCanvas.id = 'monthlyTrendsChart';
+        lineChartContainer.appendChild(lineCanvas);
+
+        // Create pie chart container
+        const pieChartContainer = document.createElement('div');
+        pieChartContainer.className = 'chart-container';
+        const pieCanvas = document.createElement('canvas');
+        pieCanvas.id = 'transactionDistributionChart';
+        pieChartContainer.appendChild(pieCanvas);
+
+        // Assemble the structure
+        chartsRowSection.appendChild(lineChartContainer);
+        chartsRowSection.appendChild(pieChartContainer);
+        visualizationContainer.appendChild(barChartSection);
+        visualizationContainer.appendChild(chartsRowSection);
+
+        // Add to the DOM
+        const appContainer = document.getElementById('app');
+        appContainer.appendChild(visualizationContainer);
+
         // Fetch data for each chart type
         const [volumeResponse, monthlyResponse, distributionResponse] = await Promise.all([
             fetchFromAPI('/visualization/transaction-volume'),
