@@ -1,5 +1,18 @@
 import { API_CONFIG } from './config.js';
 
+export async function fetchFromAPI(endpoint) {
+    try {
+        const response = await fetch(`${API_CONFIG.baseUrl}${endpoint}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch data from ${endpoint}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error(`Error fetching from ${endpoint}:`, error);
+        throw error;
+    }
+}
+
 export async function fetchTransactionVolume() {
     try {
         const transactionTypes = [

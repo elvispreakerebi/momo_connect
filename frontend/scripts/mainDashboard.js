@@ -1,4 +1,5 @@
 import { fetchTransactionVolume } from './api.js';
+import './visualization.js';
 
 class MainDashboard {
     constructor() {
@@ -33,6 +34,50 @@ class MainDashboard {
         });
 
         mainContent.appendChild(cardsContainer);
+
+        // Create visualization container
+        const visualizationContainer = document.createElement('div');
+        visualizationContainer.className = 'visualization-container';
+
+        // Create charts column
+        const chartsColumn = document.createElement('div');
+        chartsColumn.className = 'charts-column';
+
+        // Create transaction volume chart container
+        const volumeChartContainer = document.createElement('div');
+        volumeChartContainer.className = 'chart-container';
+        const volumeCanvas = document.createElement('canvas');
+        volumeCanvas.id = 'transactionVolumeChart';
+        volumeChartContainer.appendChild(volumeCanvas);
+
+        // Create monthly trends chart container
+        const trendsChartContainer = document.createElement('div');
+        trendsChartContainer.className = 'chart-container';
+        const trendsCanvas = document.createElement('canvas');
+        trendsCanvas.id = 'monthlyTrendsChart';
+        trendsChartContainer.appendChild(trendsCanvas);
+
+        chartsColumn.appendChild(volumeChartContainer);
+        chartsColumn.appendChild(trendsChartContainer);
+
+        // Create pie chart column
+        const pieChartColumn = document.createElement('div');
+        pieChartColumn.className = 'pie-chart-column';
+
+        // Create distribution chart container
+        const distributionChartContainer = document.createElement('div');
+        distributionChartContainer.className = 'chart-container';
+        const distributionCanvas = document.createElement('canvas');
+        distributionCanvas.id = 'transactionDistributionChart';
+        distributionChartContainer.appendChild(distributionCanvas);
+
+        pieChartColumn.appendChild(distributionChartContainer);
+
+        // Add columns to visualization container
+        visualizationContainer.appendChild(chartsColumn);
+        visualizationContainer.appendChild(pieChartColumn);
+
+        mainContent.appendChild(visualizationContainer);
         this.container.appendChild(mainContent);
 
         // Fetch and update transaction data
