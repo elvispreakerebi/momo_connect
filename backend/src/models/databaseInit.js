@@ -1,4 +1,5 @@
 const pool = require('../config/database');
+const { Sequelize } = require('sequelize');
 const { createIncomingMoneyTable } = require('./incomingMoneyModel');
 const { createErrorLogsTable } = require('./errorLogsModel');
 const { createPaymentToCodeHoldersTable } = require('./paymentToCodeHoldersModel');
@@ -8,6 +9,15 @@ const { createCashPowerTable } = require('./cashPowerModel');
 const { createBundlesAndPacksTable } = require('./bundlesAndPacksModel');
 const { createWithdrawalFromAgentTable } = require('./withdrawalFromAgentModel');
 const { createBankDepositTable } = require('./bankDepositModel');
+
+const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
+  host: process.env.DB_HOST,
+  dialect: 'mysql',
+  port: process.env.DB_PORT || 19926,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
 
 // Database initialization function
 async function initializeDatabase() {
@@ -50,5 +60,6 @@ async function initializeDatabase() {
 
 module.exports = {
   pool,
-  initializeDatabase
+  initializeDatabase,
+  sequelize
 };
